@@ -4,7 +4,7 @@ from gym import spaces, logger
 from gym.utils import seeding
 import numpy as np
 
-
+# this is chris
 
 class TicTacToe():
     """
@@ -98,7 +98,7 @@ class TicTacToe():
             if self.state[action_row, action_col] != 0:
                 # The action is on a cell already occupied, this is an automatic loss.
                 reward = -1
-                self.done = True
+#                self.done = True
             else:
                 self.state[action_row, action_col] = self.current_player
 
@@ -107,10 +107,13 @@ class TicTacToe():
         if winner_id != 0:
             self.done = True
             if self.current_player == winner_id:
-                reward = 1
+                reward = 5
             else:
                 reward = -1
 
+        #test for full board
+        if np.min(self.state) > 0:
+            self.done = True
 
         #swap players and flip state for player 2
         current_observation = np.array(self.state)
@@ -160,6 +163,7 @@ class TicTacToe():
     def reset(self):
         self.state = np.zeros((3,3))
         self.current_player = np.random.randint(1,3)
+        self.done = False
 
 
 
@@ -228,15 +232,14 @@ class TicTacToe():
             self.viewer = None
 
 
-
-
-env = TicTacToe()
-env.reset()
-print(env)
-
-while True:
-    action = int(input(" 0 1 2 \n 3 4 5 \n 6 7 8"))
-    current_observation, reward, done, what = env.step(action)
-    if done:
-        print("DONEDONEDONE")
+if __name__ == 'main':
+    env = TicTacToe()
+    env.reset()
     print(env)
+
+    while True:
+        action = int(input(" 0 1 2 \n 3 4 5 \n 6 7 8"))
+        current_observation, reward, done, what = env.step(action)
+        if done:
+            print("DONEDONEDONE")
+        print(env)
