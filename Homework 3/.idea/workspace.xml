@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="952f8eb4-6b54-46be-8c41-226bdb780837" name="Default Changelist" comment="" />
+    <list default="true" id="952f8eb4-6b54-46be-8c41-226bdb780837" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../TicTacToe/venv/Players.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TicTacToe/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../TicTacToe/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TicTacToe/venv/TicTacToe.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../TicTacToe/venv/TicTacToe.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../TicTacToe/venv/interface_wrapper.py" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,7 +18,7 @@
     <session id="644099816">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.3" value="2" />
           <entry key="project.open.time.4" value="1" />
@@ -53,11 +59,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/run_dqn_atari.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1650">
-              <caret line="121" column="18" selection-start-line="121" selection-start-column="18" selection-end-line="121" selection-end-column="18" />
+            <state relative-caret-position="105">
+              <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -65,11 +71,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dqn.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="175">
-              <caret line="168" selection-start-line="168" selection-end-line="168" />
+            <state relative-caret-position="130">
+              <caret line="165" lean-forward="true" selection-start-line="165" selection-end-line="165" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -84,6 +90,9 @@
       <find>step</find>
     </findStrings>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -97,6 +106,7 @@
     <option name="width" value="1227" />
     <option name="height" value="1172" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -146,7 +156,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="2560" y="-2" width="2560" height="1442" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1206149" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -178,22 +187,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/run_dqn_atari.py">
+    <entry file="file://$PROJECT_DIR$/dqn.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1650">
-          <caret line="121" column="18" selection-start-line="121" selection-start-column="18" selection-end-line="121" selection-end-column="18" />
+        <state relative-caret-position="130">
+          <caret line="165" lean-forward="true" selection-start-line="165" selection-end-line="165" />
           <folding>
-            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dqn.py">
+    <entry file="file://$PROJECT_DIR$/run_dqn_atari.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="175">
-          <caret line="168" selection-start-line="168" selection-end-line="168" />
+        <state relative-caret-position="105">
+          <caret line="46" column="31" lean-forward="true" selection-start-line="46" selection-start-column="31" selection-end-line="46" selection-end-column="31" />
           <folding>
-            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>

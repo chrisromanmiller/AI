@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8aac457e-2791-4b10-afa0-aea8cbaff15c" name="Default Changelist" comment="" />
+    <list default="true" id="8aac457e-2791-4b10-afa0-aea8cbaff15c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/venv/Players.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Homework 3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Homework 3/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/TicTacToe.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/venv/TicTacToe.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/venv/interface_wrapper.py" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,25 +26,27 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="py" value="2" />
+          <entry key="ipynb" value="1" />
+          <entry key="py" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Python" value="2" />
+          <entry key="IPNB" value="1" />
+          <entry key="Python" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="55" />
           <entry key="dummy" value="10" />
-          <entry key="py" value="5264" />
+          <entry key="py" value="9328" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="10" />
-          <entry key="Python" value="5319" />
+          <entry key="Python" value="9383" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.vcs.git.usages" />
@@ -46,32 +54,55 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/venv/TicTacToe.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="424">
-              <caret line="218" column="44" lean-forward="true" selection-start-line="218" selection-start-column="44" selection-end-line="218" selection-end-column="44" />
+            <state relative-caret-position="664">
+              <caret line="234" column="22" lean-forward="true" selection-start-line="234" selection-start-column="22" selection-end-line="234" selection-end-column="22" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-                <marker date="1540531066020" expanded="true" signature="124:2822" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="1219:2600" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="1639:2600" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="2617:2622" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="3121:4080" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="3121:5539" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="3121:5543" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="4178:4462" ph="..." />
-                <marker date="1540531066020" expanded="true" signature="5690:5696" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/venv/Players.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="21" column="51" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
+              <folding>
+                <element signature="e#0#35#0" expanded="true" />
+                <marker date="1540768137970" expanded="true" signature="98:99" ph="..." />
+                <marker date="1540768137970" expanded="true" signature="98:104" ph="..." />
+                <marker date="1540768137970" expanded="true" signature="416:417" ph="..." />
+                <marker date="1540768137970" expanded="true" signature="416:739" ph="..." />
+                <marker date="1540768137970" expanded="true" signature="783:788" ph="..." />
+                <marker date="1540768137970" expanded="true" signature="1804:1860" ph="..." />
+                <marker date="1540768137970" expanded="true" signature="2582:2587" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/venv/interface_wrapper.py">
+        <entry file="file://$PROJECT_DIR$/venv/TicTacToe.ipynb">
+          <provider selected="true" editor-type-id="ipnb-editor">
+            <state>
+              <selected id="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/venv/sandbox.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+            <state relative-caret-position="404">
+              <caret line="35" column="25" lean-forward="true" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+                <marker date="1540767678247" expanded="true" signature="1192:1195" ph="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -85,12 +116,28 @@
       </list>
     </option>
   </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>action</find>
+      <find>sample_action</find>
+      <find>board_pl</find>
+      <find>board_place</find>
+      <find>TicTacToe_model</find>
+      <find>tictactoe_model</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/venv/interface.py" />
         <option value="$PROJECT_DIR$/venv/interface_wrapper.py" />
         <option value="$PROJECT_DIR$/venv/TicTacToe.py" />
+        <option value="$PROJECT_DIR$/venv/TicTacToe.ipynb" />
+        <option value="$PROJECT_DIR$/venv/sandbox.py" />
+        <option value="$PROJECT_DIR$/venv/Players.py" />
       </list>
     </option>
   </component>
@@ -99,6 +146,9 @@
     <option name="y" value="76" />
     <option name="width" value="1227" />
     <option name="height" value="1172" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -140,7 +190,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.interface">
+  <component name="RunManager" selected="Python.sandbox">
     <configuration name="interface" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="TicTacToe" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -183,12 +233,35 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="sandbox" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="TicTacToe" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/venv" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/venv/sandbox.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.interface" />
       <item itemvalue="Python.interface_wrapper" />
+      <item itemvalue="Python.sandbox" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.sandbox" />
         <item itemvalue="Python.interface" />
         <item itemvalue="Python.interface_wrapper" />
       </list>
@@ -216,7 +289,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32952815" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.2980183" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39954337" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -243,19 +316,45 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/venv/TicTacToe.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="424">
-          <caret line="218" column="44" lean-forward="true" selection-start-line="218" selection-start-column="44" selection-end-line="218" selection-end-column="44" />
+        <state relative-caret-position="664">
+          <caret line="234" column="22" lean-forward="true" selection-start-line="234" selection-start-column="22" selection-end-line="234" selection-end-column="22" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
-            <marker date="1540531066020" expanded="true" signature="124:2822" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="1219:2600" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="1639:2600" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="2617:2622" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="3121:4080" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="3121:5539" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="3121:5543" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="4178:4462" ph="..." />
-            <marker date="1540531066020" expanded="true" signature="5690:5696" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/TicTacToe.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/sandbox.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="404">
+          <caret line="35" column="25" lean-forward="true" selection-start-line="35" selection-start-column="25" selection-end-line="35" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1540767678247" expanded="true" signature="1192:1195" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/Players.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="51" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+            <marker date="1540768137970" expanded="true" signature="98:99" ph="..." />
+            <marker date="1540768137970" expanded="true" signature="98:104" ph="..." />
+            <marker date="1540768137970" expanded="true" signature="416:417" ph="..." />
+            <marker date="1540768137970" expanded="true" signature="416:739" ph="..." />
+            <marker date="1540768137970" expanded="true" signature="783:788" ph="..." />
+            <marker date="1540768137970" expanded="true" signature="1804:1860" ph="..." />
+            <marker date="1540768137970" expanded="true" signature="2582:2587" ph="..." />
           </folding>
         </state>
       </provider>
