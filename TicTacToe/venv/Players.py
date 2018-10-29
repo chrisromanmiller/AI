@@ -46,21 +46,33 @@ class Random_Player(Player):
 
 class NN_Player(Player):
     """Player which uses a NN to dictate policy"""
-    def __init__(self, model, model_sample_s, session, observation_placeholder):
+    def __init__(self, model, model_sample_s, session, observation_placeholder, duplicate=True):
         #Keep a fixed model pointer
         self.model = model
         self.model_sample_s = model_sample_s
         #Keep a fixed observation_placehold pointer
         self.observation_placeholder = observation_placeholder
 
-        temp_file_name = './to_duplicate.ckpt'
 
 
-        #Want to duplicate session
-        saver = tf.train.Saver()
-        saver.save(session, temp_file_name)
-        self.session = tf.Session()
-        saver.restore(self.session, temp_file_name)
+        if duplicate:
+            print("duplicating session to freeze weights for evaluation...")
+            temp_file_name = './to_duplicate.ckpt'
+
+
+            #Want to duplicate session
+            saver = tf.train.Saver()
+            saver.save(session, temp_file_name)
+            self.session = tf.Session()
+            saver.restore(self.session, temp_file_name)
+        else:
+            print("Warning: not duplicating session, evaluation will change with tf updates")
+            self.session = session
+
+    def __del__(self):
+        """Need to destroy tensorflow session"""
+        print("Destroying NN_Player and Session...")
+        self.session.close()
 
     def peek(self):
         print("NN_Player Peek")
