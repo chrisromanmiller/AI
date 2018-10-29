@@ -1,4 +1,4 @@
-  from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod
 import numpy as np
 import tensorflow as tf
 
@@ -61,176 +61,205 @@ class Expert_Player(Player):
 
 
 	def policy(self, observations, legal_moves):
-	
-	"""	0 1 2 
-		3 4 5
-		6 7 8 """
-	
-	for observation, legal_moves in zip(observations, legal_moves):
-		action = None
-		observation_flatten_list = observation.flatten().to_list()
-		player_moves_N = observation_flatten_list.count(1)
-		opponent_moves_N = observation_flatten_list.count(2)
-		
-		#handle edge cases
-		#check for blocking moves
-		#check for winning moves
-		#last action to be set is the action taken ^reverse order of importance
-		
-		
-		if player_moves_N == 0 and opponent_moves_N == 0:
-			action = 0
-		if player_moves_N == 0 and opponent_moves_N == 1:
-			if legal_moves[4] == 1:
-				action = 4
-			else:
-				action = 0
-		
-		if player_moves_N == 1 and opponent_moves_N == 1:
-			if observations_flatten_list[6] == 2:
-				action = 2
-			if observations_flatten_list[2] == 2:
-				action = 6
-			if observations_flatten_list[4] == 2:
-				action = 8
-			action = 4
+		"""	0 1 2 
+			3 4 5
+			6 7 8 """
+		actions = []
+		for observation, legal_moves in zip(observations, legal_moves):
+			action = None
+			observation_flatten_list = observation.flatten().tolist()
+			player_moves_N = observation_flatten_list.count(1)
+			opponent_moves_N = observation_flatten_list.count(2)
+			#handle edge cases
+			#check for blocking moves
+			#check for winning moves
+			#last action to be set is the action taken ^reverse order of importance
 			
-		if opponent_moves_N == 2 and player_moves_N == 1:
-			"""X
-			    O
-				 X"""
-			if observations_flatten_list[0] == 2 and observation_flatten_list[8] == 2 and observation_flatten_list[4] == 1:
-				action = 7
-			if observations_flatten_list[2] == 2 and observation_flatten_list[6] == 2 and observation_flatten_list[4] == 1:
-				action = 7
-			"""O
-			    X
-				 O"""
-			if observations_flatten_list[0] == 2 and observation_flatten_list[4] == 2 and observation_flatten_list[8] == 1:
-				action = 6
-			if observations_flatten_list[0] == 1 and observation_flatten_list[4] == 2 and observation_flatten_list[8] == 2:
-				action = 6
-			if observations_flatten_list[2] == 1 and observation_flatten_list[4] == 2 and observation_flatten_list[6] == 2:
+			
+			if player_moves_N == 0 and opponent_moves_N == 0:
 				action = 0
-			if observations_flatten_list[6] == 1 and observation_flatten_list[4] == 2 and observation_flatten_list[2] == 2:
-				action = 0
-			"""X
-			    O
-				X""""
-			if observation_flatten_list[4] == 1:
-				if observation_flatten_list[0] == 2 and observation_flatten_list[8] == 0:
-					action = 8
-				if observation_flatten_list[8] == 2 and observation_flatten_list[0] == 0:
-					action = 0
-				if observation_flatten_list[6] == 2 and observation_flatten_list[4] == 0:
+			if player_moves_N == 0 and opponent_moves_N == 1:
+				if legal_moves[4] == 1:
 					action = 4
-				if observation_flatten_list[4] == 0 and observation_flatten_list[6] == 0:
-					action = 6
-			""" X
-				O
-				X"""
-			if observation_flatten_list[4] == 2 and observation_flatten_list[1] == 1 and observation_flatten_list[7] == 2:
-				action = 5
-			if observation_flatten_list[4] == 2 and observation_flatten_list[3] == 1 and observation_flatten_list[5] == 2:
-				action = 1
-			
-			
-			
-		
-			
-		if opponent_moves_N == 2 and player_moves_N == 2:
-			if observation_flatten_list[1] == 2 and observation_flatten_list[2] == 1:
-				action = 8
-			if observation_flatten_list[3] == 2 and observation_flatten_list[6] == 1:
-				action = 8
-			
-		if opponent_moves_N == 3 and player_moves_N == 2:
-		"""o  
-		   xxo
-		     x"""
-			if observation_flatten_list[1] = 0:
-				if observation_flatten_list[0] = 1 and observation_flatten_list[2] = 0:
-					action = 2
-				if observation_flatten_list[2]  =0 and observation_flatten_list[0] = 1:
+				else:
 					action = 0
-			if observation_flatten_list[3] = 0:
-				if observation_flatten_list[0] = 1 and observation_flatten_list[6] = 0:
-					action = 6
-				if observation_flatten_list[6] = 0 and observation_flatten_list[0] = 1:
-					action = 0
-			if observation_flatten_list[5] = 0:
-				if observation_flatten_list[2] = 1 and observation_flatten_list[8] = 0:
-					action = 8
-				if observation_flatten_list[2] = 0 and observation_flatten_list[8] = 1:
+			
+			if player_moves_N == 1 and opponent_moves_N == 1:
+				if observation_flatten_list[6] == 2:
 					action = 2
-			if observation_flatten_list[7]= 0:
-				if observation_flatten_list[6] = 1 and observation_flatten_list[8] = 0:
-					action = 8
-				if observation_flatten_list[6] = 0 and observation_flatten_list[8] = 1:
+				elif observation_flatten_list[2] == 2:
 					action = 6
-		""" x  
-		   xoo
-		    x """
-			if observation_flatten_list[1] == 2 and observation_flatten_list[3] == 2 and observation_flatten_list[7] == 2 and observation_flatten_list[4] == 1 and observation_flatten_list[5] == 1:
-				action = 2
-			if observation_flatten_list[1] == 2 and observation_flatten_list[3] == 2 and observation_flatten_list[4] == 1 and observation_flatten_list[5] == 2 and observation_flatten_list[7] == 1:
-				action = 6
-			if observation_flatten_list[1] == 2 and observation_flatten_list[5] == 2 and observation_flatten_list[7] == 2 and observation_flatten_list[4] == 1 and observation_flatten_list[3] == 1:
-				action = 0
-			if observation_flatten_list[3] == 2 and observation_flatten_list[7] == 2 and observation_flatten_list[5] == 2 and observation_flatten_list[1] == 1 and observation_flatten_list[4] == 1:
-				action = 0	
-		
-		"""x   
-		    ox
-			xo"""
-			if observation_flatten_list[4] == 1 and observation_flatten_list[8] == 1 and observation_flatten_list[1] == 2 and observation_flatten_list[5] == 2 and observation_flatten_list[7] == 2:
-				action = 2
-			if observation_flatten_list[4] == 1 and observation_flatten_list[0] == 1 and observation_flatten_list[8] == 2 and observation_flatten_list[2] == 2 and observation_flatten_list[4] == 2:
-				action = 2
-			if observation_flatten_list[4] == 1 and observation_flatten_list[2] == 1 and observation_flatten_list[6] == 2 and observation_flatten_list[1] == 2 and observation_flatten_list[5] == 2:
-				action = 0
-			if observation_flatten_list[4] == 1 and observation_flatten_list[2] == 2 and observation_flatten_list[6] == 1 and observation_flatten_list[3] == 2 and observation_flatten_list[7] == 2:
-				action = 0	
-			
-		if player_moves_N = 3 and opponent_moves_N = 4:
-			if observation_flatten_list[1] == 0:
-				action = 1
-			if observation_flatten_list[3] == 0:
-				action = 3
-			if observation_flatten_list[5] == 0:
-				action = 5
-			if observation_flatten_list[7] == 0:
-				action = 7
-		
-		
-		
-		lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
-			
-			
-		#block moves
-		for line in lines:
-			board_line_values = []
-			for entry in line:
-				board_line_values.append(observation_flatten_list[entry])
-			if board_line_values.count(0) > 0 and board_line_values.count(2) == 2:
-				#find winning move:
-				action = line[board_line_values.index(0)]
-		
-		#win game!
-		for line in lines:
-			board_line_values = []
-			for entry in line:
-				board_line_values.append(observation_flatten_list[entry])
-			if board_line_values.count(0) > 0 and board_line_values.count(1) == 2:
-				#find winning move:
-				action = line[board_line_values.index(0)]
+				elif observation_flatten_list[4] == 2:
+					action = 8
+				elif observation_flatten_list[8] == 2:
+					action = 2
+				else:
+					action = 4
 				
-		assert action is not None, "No action for Expert Policy"
-		actions.append(action)
-	return actions
+			if opponent_moves_N == 2 and player_moves_N == 1:
+
+
+
+				"""X
+				    O
+					 X"""
+				if observation_flatten_list[0] == 2 and observation_flatten_list[8] == 2 and observation_flatten_list[4] == 1:
+					action = 7
+				if observation_flatten_list[2] == 2 and observation_flatten_list[6] == 2 and observation_flatten_list[4] == 1:
+					action = 7
+				"""O
+				    X
+					 O"""
+				if observation_flatten_list[0] == 2 and observation_flatten_list[4] == 2 and observation_flatten_list[8] == 1:
+					action = 6
+				if observation_flatten_list[0] == 1 and observation_flatten_list[4] == 2 and observation_flatten_list[8] == 2:
+					action = 6
+				if observation_flatten_list[2] == 1 and observation_flatten_list[4] == 2 and observation_flatten_list[6] == 2:
+					action = 0
+				if observation_flatten_list[6] == 1 and observation_flatten_list[4] == 2 and observation_flatten_list[2] == 2:
+					action = 0
+				"""X
+				    O
+					X"""
+				if observation_flatten_list[4] == 1:
+					if observation_flatten_list[0] == 2 and observation_flatten_list[8] == 0:
+						action = 8
+					if observation_flatten_list[8] == 2 and observation_flatten_list[0] == 0:
+						action = 0
+					if observation_flatten_list[6] == 2 and observation_flatten_list[2] == 0:
+						action = 2
+					if observation_flatten_list[2] == 2 and observation_flatten_list[6] == 0:
+						action = 6
+				""" X
+					O
+					X"""
+				if observation_flatten_list[4] == 1 and observation_flatten_list[1] == 2 and observation_flatten_list[7] == 2:
+					action = 5
+				if observation_flatten_list[4] == 1 and observation_flatten_list[3] == 2 and observation_flatten_list[5] == 2:
+					action = 1
+				""" X
+				   XO"""
+				if observation_flatten_list[4] ==1 and observation_flatten_list[1] == 2:
+					if observation_flatten_list[5] == 2:
+						action = 2
+					if observation_flatten_list[3] ==2:
+						action = 0
+				if observation_flatten_list[4] ==1 and observation_flatten_list[7] == 2:
+					if observation_flatten_list[5] == 2:
+						action = 8
+					if observation_flatten_list[3] ==2:
+						action = 6
+				
+				
+				
+			
+				
+			if opponent_moves_N == 2 and player_moves_N == 2:
+				if observation_flatten_list[4] == 1 and observation_flatten_list[8] == 2 and observation_flatten_list[1] == 2:
+					action = 6
+				elif observation_flatten_list[4] == 1 and observation_flatten_list[8] ==2 and observation_flatten_list[3] ==2:
+					action = 2
+				if observation_flatten_list[1] == 2 and observation_flatten_list[2] == 1:
+					action = 8
+				if observation_flatten_list[3] == 2 and observation_flatten_list[6] == 1:
+					action = 8
+				if observation_flatten_list[1] == 2 and observation_flatten_list[2] == 1 and observation_flatten_list[8] == 2:
+					action = 6
+				
+			if opponent_moves_N == 3 and player_moves_N == 2:
+				"""o  
+				   xxo
+				     x"""
+				if observation_flatten_list[1] == 0:
+					if observation_flatten_list[0] == 1 and observation_flatten_list[2] == 0:
+						action = 2
+					if observation_flatten_list[2]  ==1 and observation_flatten_list[0] == 0:
+						action = 0
+				if observation_flatten_list[3] == 0:
+					if observation_flatten_list[0] == 1 and observation_flatten_list[6] == 0:
+						action = 6
+					if observation_flatten_list[6] == 1 and observation_flatten_list[0] == 0:
+						action = 0
+				if observation_flatten_list[5] == 0:
+					if observation_flatten_list[2] == 1 and observation_flatten_list[8] == 0:
+						action = 8
+					if observation_flatten_list[2] == 0 and observation_flatten_list[8] == 1:
+						action = 2
+				if observation_flatten_list[7]== 0:
+					if observation_flatten_list[6] == 1 and observation_flatten_list[8] == 0:
+						action = 8
+					if observation_flatten_list[6] == 0 and observation_flatten_list[8] == 1:
+						action = 6
+				""" x  
+				   xoo
+				    x """
+				if observation_flatten_list[1] == 2 and observation_flatten_list[3] == 2 and observation_flatten_list[7] == 2 and observation_flatten_list[4] == 1 and observation_flatten_list[5] == 1:
+					action = 2
+				if observation_flatten_list[1] == 2 and observation_flatten_list[3] == 2 and observation_flatten_list[4] == 1 and observation_flatten_list[5] == 2 and observation_flatten_list[7] == 1:
+					action = 6
+				if observation_flatten_list[1] == 2 and observation_flatten_list[5] == 2 and observation_flatten_list[7] == 2 and observation_flatten_list[4] == 1 and observation_flatten_list[3] == 1:
+					action = 0
+				if observation_flatten_list[3] == 2 and observation_flatten_list[7] == 2 and observation_flatten_list[5] == 2 and observation_flatten_list[1] == 1 and observation_flatten_list[4] == 1:
+					action = 0	
+			
+				"""x   
+				    ox
+					xo"""
+				if observation_flatten_list[4] == 1 and observation_flatten_list[8] == 1 and observation_flatten_list[0] == 2 and observation_flatten_list[5] == 2 and observation_flatten_list[7] == 2:
+					action = 2
+				if observation_flatten_list[4] == 1 and observation_flatten_list[0] == 1 and observation_flatten_list[8] == 2 and observation_flatten_list[1] == 2 and observation_flatten_list[3] == 2:
+					action = 2
+				if observation_flatten_list[4] == 1 and observation_flatten_list[2] == 1 and observation_flatten_list[6] == 2 and observation_flatten_list[1] == 2 and observation_flatten_list[5] == 2:
+					action = 0
+				if observation_flatten_list[4] == 1 and observation_flatten_list[2] == 2 and observation_flatten_list[6] == 1 and observation_flatten_list[3] == 2 and observation_flatten_list[7] == 2:
+					action = 0	
+
+				"""xox
+				    o
+				    x"""
+				if observation_flatten_list[4] ==1 and observation_flatten_list[0] == 2 and observation_flatten_list[1] == 1 and observation_flatten_list[2] == 2 and observation_flatten_list[7] == 2:
+					action = 3
+				if observation_flatten_list[4] ==1 and observation_flatten_list[0] == 2 and observation_flatten_list[3] == 1 and observation_flatten_list[6] == 2 and observation_flatten_list[5] == 2:
+					action = 1
+				if observation_flatten_list[4] ==1 and observation_flatten_list[2] == 2 and observation_flatten_list[5] == 1 and observation_flatten_list[8] == 2 and observation_flatten_list[3] == 2:
+					action = 1
+				if observation_flatten_list[4] ==1 and observation_flatten_list[6] == 2 and observation_flatten_list[7] == 1 and observation_flatten_list[8] == 2 and observation_flatten_list[1] == 2:
+					action = 3
+				
+			if player_moves_N == 3 and opponent_moves_N == 4:
+				action = np.where(legal_moves)[0][0]
+			
+			
+			
+			lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
+				
+				
+			#block moves
+			for line in lines:
+				board_line_values = []
+				for entry in line:
+					board_line_values.append(observation_flatten_list[entry])
+				if board_line_values.count(0) > 0 and board_line_values.count(2) == 2:
+					#find winning move:
+					action = line[board_line_values.index(0)]
+					# print("found block")
+			
+			#win game!
+			for line in lines:
+				board_line_values = []
+				for entry in line:
+					board_line_values.append(observation_flatten_list[entry])
+				if board_line_values.count(0) > 0 and board_line_values.count(1) == 2:
+					#find winning move:
+					action = line[board_line_values.index(0)]
+					# print("found winning move")
+					
+			assert action is not None, print("No action for Expert Policy", observation)
+			actions.append(action)
+		return actions
 		
 		
-		
+	
 
 class NN_Player(Player):
     """Player which uses a NN to dictate policy"""

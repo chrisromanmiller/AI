@@ -109,7 +109,7 @@ class TicTacToe():
 
         #make sure game is not over before attempting to play
         if not self.done:
-            assert self.state[action_row, action_col] ==0, print("You have played an illegal action. Use legal_moves()")
+            assert self.state[action_row, action_col] ==0, print("You have played an illegal action. Use legal_moves()", self.state,self.get_observation(self.current_player), action)
 #             if self.state[action_row, action_col] != 0:
 #
 #                 # The action is on a cell already occupied, illegal move negative reward
@@ -119,7 +119,7 @@ class TicTacToe():
 #             else:
             self.state[action_row, action_col] = self.current_player
 
-        
+
         #test for full board
         if np.min(self.state) > 0:
             self.done = True
@@ -195,7 +195,7 @@ class TicTacToe():
 
 
     def reset(self):
-        self.state = np.zeros((3,3))
+        self.state = np.zeros((3,3), dtype=np.int16)
         self.current_player = np.random.randint(1,3)
         self.done = False
         self.illegal_moves_N = [0,0]
