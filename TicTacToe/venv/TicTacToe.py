@@ -119,6 +119,12 @@ class TicTacToe():
 #             else:
             self.state[action_row, action_col] = self.current_player
 
+        
+        #test for full board
+        if np.min(self.state) > 0:
+            self.done = True
+            self.current_winner = 0
+
         #internal command which tests for win condition
         winner_id = self.state_has_row()
         if winner_id != 0:
@@ -131,10 +137,6 @@ class TicTacToe():
             # else:
             #     reward += -1
 
-        #test for full board
-        if np.min(self.state) > 0:
-            self.done = True
-            self.current_winner = 0
 
 
         #swap players and flip state for player 2
