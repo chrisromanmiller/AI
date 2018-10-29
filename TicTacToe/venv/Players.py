@@ -16,15 +16,24 @@ class Player(ABC):
 
 
 class Human_Player(Player):
+
+
     def policy(self, observations, legal_moves):
         #Get batchsize
         observations_N = observations.shape[0]
+        print(observations_N)
         actions = np.ndarray((observations_N,), int)
         for index in range(observations_N):
             legal_move = False
-            while not legal_move:
-                actions[index] = int(input("Please input an action:"))
-                legal_move = (legal_moves[index][action[index]] == 1)
+            print(observations[index])
+            # while not legal_move:
+            #     try: input = raw_input
+            #     except NameError: pass
+            in_ = input("Say something: ")
+
+            actions[index] = in_
+            legal_move = (legal_moves[index][actions[index]] == 1)
+        print(actions)
         return actions
 
 class Random_Player(Player):

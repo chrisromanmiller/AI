@@ -144,7 +144,7 @@ class TicTacToe():
         #     current_observation = self.flip_state(current_observation)
         # else:
         #     self.current_player = 1
-        self.current_player = (self.current_player + 1) % 2
+        self.current_player = (self.current_player % 2) + 1
 
         return self.done, {}
 
@@ -178,7 +178,7 @@ class TicTacToe():
             row_player_id = self.state[0,0]
         if self.state[0,2] == self.state[1,1] and self.state[1,1] == self.state[2,0] and self.state[0,2] != 0:
             row_player_id = self.state[0,2]
-        return row_player_id
+        return int(row_player_id)
 
     def legal_moves(self):
         """Returns binary mask on action space for legal moves"""
@@ -188,7 +188,7 @@ class TicTacToe():
                 state_flatten[index] = 0
             else:
                 state_flatten[index] = 1
-        return state_flatten
+        return np.array(state_flatten)
 
 
 
