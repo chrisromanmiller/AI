@@ -51,6 +51,8 @@ class TicTacToe():
         self.illegal_moves_N = None
         self.current_winner = None
 
+        self.rewards = None
+
 
         self.done = False
 
@@ -80,15 +82,24 @@ class TicTacToe():
     #     self.np_random, seed = seeding.np_random(seed)
     #     return [seed]
 
+    """returns observation of the state for player_id"""
+    def get_observation(self, player_id):
+        current_observation = np.array(self.state)
+        if player_id == 2:
+            current_observation = self.flip_state(current_observation)
+        return current_observation
 
+    """returns the current reward for """
+    def get_reward(self, player_id):
+        return self.rewards[player_id-1]
 
-
-    """ the observation returned is intended for the next player, while the reward is for the player who just acted"""
+    """observation and reward should be queried seperately on a per player basis"""
     def step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
         # state = self.state
 
-        reward = 0
+        self.rewards[self.current_player - 1] = 0
+
 
         # 0 1 2
         # 3 4 5
@@ -98,23 +109,27 @@ class TicTacToe():
 
         #make sure game is not over before attempting to play
         if not self.done:
-            if self.state[action_row, action_col] != 0:
-                # The action is on a cell already occupied, illegal move negative reward
-                self.illegal_moves_N[self.current_player-1] += 1
-                reward += -1
-#                self.done = True
-            else:
-                self.state[action_row, action_col] = self.current_player
+            assert self.state[action_row, action_col] ==0, print("You have played an illegal action. Use legal_moves()")
+#             if self.state[action_row, action_col] != 0:
+#
+#                 # The action is on a cell already occupied, illegal move negative reward
+#                 self.illegal_moves_N[self.current_player-1] += 1
+#                 reward += -1
+# #                self.done = True
+#             else:
+            self.state[action_row, action_col] = self.current_player
 
         #internal command which tests for win condition
         winner_id = self.state_has_row()
         if winner_id != 0:
             self.done = True
             self.current_winner = winner_id
-            if self.current_player == winner_id:
-                reward += 5
-            else:
-                reward += -1
+            self.rewards[self.current_winner - 1] = 1
+            self.rewards[self.current_winner % 2] = -1
+            # if self.current_player == winner_id:
+            #     reward += 5
+            # else:
+            #     reward += -1
 
         #test for full board
         if np.min(self.state) > 0:
@@ -123,14 +138,15 @@ class TicTacToe():
 
 
         #swap players and flip state for player 2
-        current_observation = np.array(self.state)
-        if self.current_player == 1:
-            self.current_player = 2
-            current_observation = self.flip_state(current_observation)
-        else:
-            self.current_player = 1
+        # current_observation = np.array(self.state)
+        # if self.current_player == 1:
+        #     self.current_player = 2
+        #     current_observation = self.flip_state(current_observation)
+        # else:
+        #     self.current_player = 1
+        self.current_player = (self.current_player + 1) % 2
 
-        return current_observation, reward, self.done, {}
+        return self.done, {}
 
 
     def flip_state(self, alter_state):
@@ -183,6 +199,7 @@ class TicTacToe():
         self.illegal_moves_N = [0,0]
         self.current_winner = None
 
+        self.rewards = [0,0]
 
 
         return np.array(self.state)
