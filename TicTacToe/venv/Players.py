@@ -8,7 +8,7 @@ class Player(ABC):
         super().__init__()
 
         @abstractmethod
-        def policy(self, observations):
+        def policy(self, observations, legal_moves):
             """ Input:  ndarray of observations, first axis has size batch_N
                 Output: ndarray of actions, first axis has size batch_N """
             pass
@@ -16,16 +16,21 @@ class Player(ABC):
 
 
 class Human_Player(Player):
-    def policy(self, observations):
+    def policy(self, observations, legal_moves):
         #Get batchsize
         observations_N = observations.shape[0]
         actions = np.ndarray((observations_N,), int)
         for index in range(observations_N):
-            actions[index] = int(input("Please input an action:"))
+            legal_move = False
+            while not legal_move:
+                actions[index] = int(input("Please input an action:"))
+                legal_move = (legal_moves[index][action[index]] == 1)
         return actions
 
 class Random_Player(Player):
-    def policy(self, observations):
+    def policy(self, observations, legal_moves):
+        """Currently poorly coded: doesnt use legal moves"""
+
         import numpy as np
         #Get batchsize
         observations_N = observations.shape[0]
@@ -46,12 +51,13 @@ class Random_Player(Player):
 
 class NN_Player(Player):
     """Player which uses a NN to dictate policy"""
-    def __init__(self, model, model_sample_s, session, observation_placeholder, duplicate=True):
+    def __init__(self, model, model_sample_s, session, observation_placeholder, mask_placeholder, duplicate=True):
         #Keep a fixed model pointer
         self.model = model
         self.model_sample_s = model_sample_s
         #Keep a fixed observation_placehold pointer
         self.observation_placeholder = observation_placeholder
+        self.mask_placeholder = mask_placeholder
 
 
 
@@ -81,6 +87,6 @@ class NN_Player(Player):
             print(var.name, np.max(self.session.run(var)))
 
 
-    def policy(self, observations):
+    def policy(self, observations, legal_moves):
         # dist = tf.distributions.Categorical(logits=self.model)
-        return self.session.run(self.model_sample_s, feed_dict={self.observation_placeholder: observations})
+        return self.session.run(self.model_sample_s, feed_dict={self.observation_placeholder: observations, self.mask_placeholder: legal_moves})

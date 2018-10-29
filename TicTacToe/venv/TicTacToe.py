@@ -46,7 +46,10 @@ class TicTacToe():
 
         self.viewer = None
         self.state = None
+
         self.current_player = None
+        self.illegal_moves_N = None
+        self.current_winner = None
 
 
         self.done = False
@@ -96,8 +99,9 @@ class TicTacToe():
         #make sure game is not over before attempting to play
         if not self.done:
             if self.state[action_row, action_col] != 0:
-                # The action is on a cell already occupied, this is an automatic loss.
-                reward = -1
+                # The action is on a cell already occupied, illegal move negative reward
+                self.illegal_moves_N[self.current_player-1] += 1
+                reward += -1
 #                self.done = True
             else:
                 self.state[action_row, action_col] = self.current_player
@@ -106,14 +110,17 @@ class TicTacToe():
         winner_id = self.state_has_row()
         if winner_id != 0:
             self.done = True
+            self.current_winner = winner_id
             if self.current_player == winner_id:
-                reward = 5
+                reward += 5
             else:
-                reward = -1
+                reward += -1
 
         #test for full board
         if np.min(self.state) > 0:
             self.done = True
+            self.current_winner = 0
+
 
         #swap players and flip state for player 2
         current_observation = np.array(self.state)
@@ -157,6 +164,15 @@ class TicTacToe():
             row_player_id = self.state[0,2]
         return row_player_id
 
+    def legal_moves(self):
+        """Returns binary mask on action space for legal moves"""
+        state_flatten =  self.state.flatten()
+        for index in range(len(state_flatten)):
+            if state_flatten[index] != 0:
+                state_flatten[index] = 0
+            else:
+                state_flatten[index] = 1
+        return state_flatten
 
 
 
@@ -164,6 +180,8 @@ class TicTacToe():
         self.state = np.zeros((3,3))
         self.current_player = np.random.randint(1,3)
         self.done = False
+        self.illegal_moves_N = [0,0]
+        self.current_winner = None
 
 
 
