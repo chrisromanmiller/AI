@@ -21,7 +21,6 @@ class Human_Player(Player):
         observations_N = observations.shape[0]
         actions = np.ndarray((observations_N,), int)
         for index in range(observations_N):
-            print(str(observations[index]))
             actions[index] = int(input("Please input an action:"))
         return actions
 
@@ -32,12 +31,9 @@ class Random_Player(Player):
         observations_N = observations.shape[0]
 
         #Flattens observations
-        print(observations)
         observation_flatten = np.reshape(observations, (observations_N, -1))
-        print(observation_flatten)
         #Picks out nonzero entry indices
         observation_flatten_nz = [[index for index in range(len(observation_flatten[obs_ind])) if observation_flatten[obs_ind][index] == 0] for obs_ind in range(observations_N)]
-        print(observation_flatten_nz)
         actions = np.ndarray((observations_N,),int)
         for obs_ind in range(observations_N):
             #Returns a random nonzero entry index
@@ -45,16 +41,15 @@ class Random_Player(Player):
                 actions[obs_ind] = observation_flatten_nz[obs_ind][np.random.randint(0,len(observation_flatten_nz[obs_ind]))]
             else:
                 actions[obs_ind] = 0
-        print(actions)
         return actions
 
 
 class NN_Player(Player):
     """Player which uses a NN to dictate policy"""
-    def __init__(self, model, session, observation_placeholder):
+    def __init__(self, model, model_sample_s, session, observation_placeholder):
         #Keep a fixed model pointer
         self.model = model
-
+        self.model_sample_s = model_sample_s
         #Keep a fixed observation_placehold pointer
         self.observation_placeholder = observation_placeholder
 
@@ -75,5 +70,5 @@ class NN_Player(Player):
 
 
     def policy(self, observations):
-        dist = tf.distributions.Categorical(logits=self.model)
-        return self.session.run(dist.sample(), feed_dict={self.observation_placeholder: observations})
+        # dist = tf.distributions.Categorical(logits=self.model)
+        return self.session.run(self.model_sample_s, feed_dict={self.observation_placeholder: observations})
