@@ -299,63 +299,69 @@ class NN_Player(Player):
             print(var.name, np.max(self.session.run(var)))
 
 
-    def policy(self, observations, legal_moves):
-        # dist = tf.distributions.Categorical(logits=self.model)
-        return self.session.run(self.model_sample_s, feed_dict={self.observation_placeholder: observations, self.mask_placeholder: legal_moves})
+    def policy(self, observations, legal_moves, epsilon = 0):
+		"""evaluates model_sample_s with probability 1 - eps
+			returns random legal_move with probability eps"""
+		random_float = np.random.rand()
+		if random_float >= epsilon:
+			return self.session.run(self.model_sample_s,
+						 feed_dict={self.observation_placeholder: observations, self.mask_placeholder: legal_moves})
+		else:
+			return np.random.choice(np.where(legal_moves))
 
 
 
-
-
-class Q_Player(Player):
-    """Player which uses Q-learning to dictate policy"""
-    def __init__(self, model, session, observation_placeholder, mask_placeholder, duplicate=True):
-        #Keep a fixed model pointer
-        self.model = model
-
-        #Keep a fixed observation_placehold pointer
-        self.observation_placeholder = observation_placeholder
-        self.mask_placeholder = mask_placeholder
-
-        #Q-learning requires a method to select the best legal move
-        indices = tf.where(self.mask_placeholder)
-        values = tf.gather_nd(model, indices)
-        denseShape = tf.cast(tf.shape(model), tf.int64)
-        x = tf.SparseTensor(indices, values, denseShape)
-        x = tf.scatter_nd(x.indices, x.values, x.dense_shape)
-        self.prediction =  tf.argmax(x, 1)
-
-
-        if duplicate:
-            print("duplicating session to freeze weights for evaluation...")
-            temp_file_name = './to_duplicate.ckpt'
-
-
-            #Want to duplicate session
-            saver = tf.train.Saver()
-            saver.save(session, temp_file_name)
-            self.session = tf.Session()
-            saver.restore(self.session, temp_file_name)
-        else:
-            print("Warning: not duplicating session, evaluation will change with tf updates")
-            self.session = session
-
-    def __del__(self):
-        """Need to destroy tensorflow session"""
-        print("Destroying Q_Player and Session...")
-        self.session.close()
-
-    def peek(self):
-        print("NN_Player Peek")
-        test_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="model-1")
-        for var in test_vars:
-            print(var.name, np.max(self.session.run(var)))
-
-
-    def policy(self, observations, legal_moves):
-        return self.session.run(self.prediction, feed_dict={self.observation_placeholder: observations, self.mask_placeholder: legal_moves})
-
-        
-    def q_function(self, observations):
-        return self.session.run(self.model, feed_dict={self.observation_placeholder: observations})
-
+#
+#
+# class Q_Player(Player):
+#     """Player which uses Q-learning to dictate policy"""
+#     def __init__(self, model, session, observation_placeholder, mask_placeholder, duplicate=True):
+#         #Keep a fixed model pointer
+#         self.model = model
+#
+#         #Keep a fixed observation_placehold pointer
+#         self.observation_placeholder = observation_placeholder
+#         self.mask_placeholder = mask_placeholder
+#
+#         #Q-learning requires a method to select the best legal move
+#         indices = tf.where(self.mask_placeholder)
+#         values = tf.gather_nd(model, indices)
+#         denseShape = tf.cast(tf.shape(model), tf.int64)
+#         x = tf.SparseTensor(indices, values, denseShape)
+#         x = tf.scatter_nd(x.indices, x.values, x.dense_shape)
+#         self.prediction =  tf.argmax(x, 1)
+#
+#
+#         if duplicate:
+#             print("duplicating session to freeze weights for evaluation...")
+#             temp_file_name = './to_duplicate.ckpt'
+#
+#
+#             #Want to duplicate session
+#             saver = tf.train.Saver()
+#             saver.save(session, temp_file_name)
+#             self.session = tf.Session()
+#             saver.restore(self.session, temp_file_name)
+#         else:
+#             print("Warning: not duplicating session, evaluation will change with tf updates")
+#             self.session = session
+#
+#     def __del__(self):
+#         """Need to destroy tensorflow session"""
+#         print("Destroying Q_Player and Session...")
+#         self.session.close()
+#
+#     def peek(self):
+#         print("NN_Player Peek")
+#         test_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="model-1")
+#         for var in test_vars:
+#             print(var.name, np.max(self.session.run(var)))
+#
+#
+#     def policy(self, observations, legal_moves):
+#         return self.session.run(self.prediction, feed_dict={self.observation_placeholder: observations, self.mask_placeholder: legal_moves})
+#
+#
+#     def q_function(self, observations):
+#         return self.session.run(self.model, feed_dict={self.observation_placeholder: observations})
+#
