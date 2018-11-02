@@ -16,45 +16,35 @@ class Player(ABC):
 
 
 class Human_Player(Player):
-
+	"""A player class which shows an input and waits for legal move"""
 
     def policy(self, observations, legal_moves):
-        #Get batchsize
-        observations_N = observations.shape[0]
-        print(observations_N)
-        actions = np.ndarray((observations_N,), int)
-        for index in range(observations_N):
-            legal_move = False
-            print(observations[index])
-            # while not legal_move:
-            #     try: input = raw_input
-            #     except NameError: pass
-            in_ = input("Say something: ")
-
-            actions[index] = in_
-            legal_move = (legal_moves[index][actions[index]] == 1)
-        print(actions)
+        actions = []
+        for observation, legal_move in zip(observations, legal_moves):
+            is_legal_move = False
+            print(observation)
+            while not legal_move:
+				action = input("Input a legal move:")
+				is_legal_move = (legal_move[action] == 1)
+			actions.append(action)
         return actions
 
 class Random_Player(Player):
+	"""A player class which randomly picks a legal move"""
+	
     def policy(self, observations, legal_moves):
         """Currently poorly coded: doesnt use legal moves"""
 
         import numpy as np
-        #Get batchsize
-        observations_N = observations.shape[0]
-
-        #Flattens observations
-        observation_flatten = np.reshape(observations, (observations_N, -1))
-        #Picks out nonzero entry indices
-        observation_flatten_nz = [[index for index in range(len(observation_flatten[obs_ind])) if observation_flatten[obs_ind][index] == 0] for obs_ind in range(observations_N)]
-        actions = np.ndarray((observations_N,),int)
-        for obs_ind in range(observations_N):
-            #Returns a random nonzero entry index
-            if len(observation_flatten_nz[obs_ind]) > 0:
-                actions[obs_ind] = observation_flatten_nz[obs_ind][np.random.randint(0,len(observation_flatten_nz[obs_ind]))]
-            else:
-                actions[obs_ind] = 0
+        actions = []
+		for observation, legal_move, in zip(observations, legal_moves):
+			legal_move_indices = np.where(legal_move)[0]
+			
+			random_action = None
+			if len(legal_move_indices) > 0:
+				random_action = np.choice(legal_move_indices)
+			actions.append(random_action)
+			
         return actions
 
 class Expert_Player(Player):
