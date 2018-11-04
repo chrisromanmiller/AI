@@ -19,37 +19,37 @@ class Human_Player(Player):
     """A player class which shows an input and waits for legal move"""
 
 
-def policy(self, observations, legal_moves):
-    actions = []
-    for observation, legal_move in zip(observations, legal_moves):
-        is_legal_move = False
-        print(observation)
-        while not legal_move:
-            action = input("Input a legal move:")
-            is_legal_move = (legal_move[action] == 1)
-        actions.append(action)
-    return actions
+    def policy(self, observations, legal_moves):
+        actions = []
+        for observation, legal_move in zip(observations, legal_moves):
+            is_legal_move = False
+            print(observation)
+            while not is_legal_move:
+                action = int(input("Input a legal move:"))
+                is_legal_move = (legal_move[action] == 1)
+            actions.append(action)
+        return actions
 
 
 class Random_Player(Player):
     """A player class which randomly picks a legal move"""
 
 
-def policy(self, observations, legal_moves):
-    """Currently poorly coded: doesnt use legal moves"""
+    def policy(self, observations, legal_moves):
+        """Currently poorly coded: doesnt use legal moves"""
 
-    import numpy as np
-    actions = []
-    for observation, legal_move, in zip(observations, legal_moves):
-        legal_move_indices = np.where(legal_move)[0]
+        import numpy as np
+        actions = []
+        for observation, legal_move, in zip(observations, legal_moves):
+            legal_move_indices = np.where(legal_move)[0]
 
-        random_action = None
-        if len(legal_move_indices) > 0:
-            random_action = np.choice(legal_move_indices)
-        actions.append(random_action)
+            random_action = None
+            if len(legal_move_indices) > 0:
+                random_action = np.choice(legal_move_indices)
+            actions.append(random_action)
 
 
-    return actions
+        return actions
 
 
 class Expert_Player(Player):
@@ -266,6 +266,48 @@ class Expert_Player(Player):
         return actions
 
 
+
+
+class Child_Player(Player):
+
+    def policy(self, observations, legal_moves):
+        # block moves
+
+        actions = []
+        for observation, legal_move, in zip(observations, legal_moves):
+            observation_flatten_list = observation.flatten().tolist()
+            legal_move_indices = np.where(legal_move)[0]
+            action = np.random.choice(legal_move_indices)
+
+
+            lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+
+            for line in lines:
+                board_line_values = []
+                for entry in line:
+                    board_line_values.append(observation_flatten_list[entry])
+                if board_line_values.count(0) > 0 and board_line_values.count(2) == 2:
+                    # find winning move:
+                    action = line[board_line_values.index(0)]
+                # print("found block")
+
+            # win game!
+            for line in lines:
+                board_line_values = []
+                for entry in line:
+                    board_line_values.append(observation_flatten_list[entry])
+                if board_line_values.count(0) > 0 and board_line_values.count(1) == 2:
+                    # find winning move:
+                    action = line[board_line_values.index(0)]
+                # print("found winning move")
+            actions.append(action)
+
+        return actions
+
+
+
+
+
 class NN_Player(Player):
     """Player which uses a NN to dictate policy
         model_sample_s symbolic operation to get probability distribution for actions
@@ -306,19 +348,51 @@ class NN_Player(Player):
     def policy(self, observations, legal_moves, epsilon=0):
         """evaluates model_sample_s with probability 1 - eps
             returns random legal_move with probability eps"""
-        random_float = np.random.rand()
-        if random_float >= epsilon:
-            distributions = self.session.run(self.model_sample_s,
-                                             feed_dict={self.observation_placeholder: observations})
-            if self.deterministic:
-                actions = []
-                for legal_move, dist in zip(legal_moves, distributions):
-                    indices = np.where(legal_move)[0]
+        distributions = self.session.run(self.model_sample_s,
+                                         feed_dict={self.observation_placeholder: observations})
+        actions = []
+        for legal_move, dist in zip(legal_moves, distributions):
+            indices = np.where(legal_move)[0]
+            if self.determistic:
+                random_float = np.random.rand()
+                if random_float >= epsilon:
                     values = dist[indices]
                     arg_max = np.argmax(values)
                     actions.append(indices[arg_max])
-                return actions
+                else:
+                    actions.append(np.random.choice(indices))
             else:
-                return
-        else:
-            return np.random.choice(np.where(legal_moves)[0])
+                """TODO: TEST"""
+                legal_probabilities = np.multiply(dist, legal_move)
+                action = np.random.choice(range(len(legal_probabilities)),legal_probabilities)
+                actions.append(action)
+
+        return actions
+
+
+
+class MCTS_Player(Player):
+    """Player which uses a NN to dictate policy
+        model_sample_s symbolic operation to get probability distribution for actions
+        determistic determines whether to arg max or draw"""
+
+    def __init__(self, mcts):
+        # Keep a fixed model pointer
+        self.mcts = mcts
+
+
+
+    def policy(self, observations, legal_moves):
+        import MCTS
+        import TicTacToe
+        """ uses the exploitation part of MCTS to evaluate
+            if state not seen before it picks a random action"""
+        actions = []
+        for observation, legal_move in zip(observations, legal_moves):
+            observation_hash = TicTacToe.TicTacToe.hash_observation(observation)
+            try:
+                mcts_node = self.mcts.states[observation_hash]
+            except KeyError:
+                mcts_node = MCTS.mcts_node_(observation, legal_move)
+            actions.append(mcts_node.exploit_policy())
+        return actions

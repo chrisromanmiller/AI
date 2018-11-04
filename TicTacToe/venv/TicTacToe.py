@@ -4,7 +4,32 @@ from gym import spaces, logger
 from gym.utils import seeding
 import numpy as np
 
-# this is chris
+
+#
+# """making a observation class wrapper so we can hash for quick look up"""
+# class tictactoe_observation():
+#
+#     def __init__(self, observation):
+#         """it is intended the raw_observation be in the form to feed into the neural net"""
+#         self.observation = observation
+#
+#     def __hash__(self):
+#         # to something with self.raw_observation
+#         hash_value = int(0)
+#         row_N = self.observation.shape[0]
+#         for (row, col), value in np.ndenumerate(self.observation):
+#             hash_value += value << ( 2*(row_N * col + row))
+#         return int(hash_value)
+#
+#
+#     def __str__(self):
+#         # how to print observation to be pretty
+#         return str(self.observation)
+#
+#
+#
+
+
 
 class TicTacToe():
     """
@@ -66,7 +91,7 @@ class TicTacToe():
                     if self.state[i,j] == 0:
                         state_strings[i,j] = ""
                     else:
-                        state_strings[i,j] = str(self.state[i,j])
+                        state_strings[i,j] = str(self.state[i, j])
 
 
 
@@ -87,7 +112,18 @@ class TicTacToe():
         current_observation = np.array(self.state)
         if player_id == 2:
             current_observation = self.flip_state(current_observation)
+        # if hashable:
+        #     return tictactoe_observation(current_observation)
+        # else:
         return current_observation
+
+    @staticmethod
+    def hash_observation(observation):
+        hash_value = int(0)
+        row_N = observation.shape[0]
+        for (row, col), value in np.ndenumerate(observation):
+            hash_value += value << (2 * (row_N * col + row))
+        return int(hash_value)
 
     """returns the current reward for """
     def get_reward(self, player_id):
@@ -124,6 +160,8 @@ class TicTacToe():
         if np.min(self.state) > 0:
             self.done = True
             self.current_winner = 0
+            self.rewards[self.current_winner - 1] = .5
+            self.rewards[self.current_winner % 2] = .5
 
         #internal command which tests for win condition
         winner_id = self.state_has_row()
@@ -131,7 +169,7 @@ class TicTacToe():
             self.done = True
             self.current_winner = winner_id
             self.rewards[self.current_winner - 1] = 1
-            self.rewards[self.current_winner % 2] = -1
+            self.rewards[self.current_winner % 2] = 0
             # if self.current_player == winner_id:
             #     reward += 5
             # else:
