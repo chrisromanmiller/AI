@@ -1,10 +1,7 @@
-import tensorflow as tf
-import gym.spaces
-import TicTacToe
-import numpy as np
-import Players
-import MCTS
+
 from collections import Counter
+import numpy as np
+
 
 def batch_rollout(player, opponent, env, max_time_steps=100):
     '''Produces a batch of rollouts from the environment.
@@ -85,80 +82,45 @@ def sample_trajectory(player, opponent, env):
     return path
 
 
-tf.reset_default_graph()
+def sample_paths(paths, batch_size=10):
+    '''From a collection of rollouts, this samples a random uniform batch
+    Inputs:
+        paths: a list of dictionaries containing the data of a rollout
+        batch_size: integer determining batch size to be returned
 
-env = TicTacToe.TicTacToe()
-env.reset()
+    Returns:
+        state1: [batch_size, ob_dim] np.array of states
+        action: [batch_size,] np.array of actions
+        state2: [batch_size, ob_dim] np.array of states
+        reward: [batch_size,] np.array of states
+        mask:   [batch_size,ac_dim] np.array of masks
+        done:   [batch_size,] binary np.array.
+            A 0 corresponds to a terminal game state, a 1 is a non-terminal game state
+    '''
 
-mcts = MCTS.mcts(exploration_costant=.8)
+    # Make the easy lists
+    observation_list = np.concatenate([path['observation'] for path in paths])
+    action_list = np.concatenate([path['action'] for path in paths])
+    reward_list = np.concatenate([path['reward'] for path in paths])
+    mask_list = np.concatenate([path['mask'] for path in paths])
 
-child = Players.Child_Player()
-expert = Players.Expert_Player()
-mcts_player = Players.MCTS_Player(mcts)
-for x in range(15000):
-    if x % 100 == 0:
-        _, stats = batch_rollout(expert, mcts_player, env)
-        print(stats[0], stats[1], stats[2])
-        if stats[1] == 0:
-            print(x)
-            print(len(mcts.states))
-            break
-    env.reset()
-    mcts.rollout(env)
+    # Make the done list
+    number_of_states = len(observation_list)
+    list_of_ones = [1] * number_of_states
+    partial_sum = 0
+    for path in paths:
+        partial_sum += len(path['observation'])
+        list_of_ones[partial_sum - 1] = 0
+    done_list = list_of_ones
 
+    # Select randomly chosen entries
+    indices = np.random.choice(number_of_states, batch_size)
+    state1 = np.array([observation_list[i] for i in indices])
+    action = np.array([action_list[i] for i in indices])
+    state2 = np.array([observation_list[(i + 1) % number_of_states] for i in indices])
+    reward = np.array([reward_list[i] for i in indices])
+    mask = np.array([mask_list[(i + 1) % number_of_states] for i in indices])
+    done = np.array([done_list[i] for i in indices])
 
+    return state1, action, state2, reward, mask, done
 
-# def TicTacToe_model(placeholder, num_actions, scope, reuse=tf.AUTO_REUSE):
-#     # A model for a TicTacToe q-function
-#     placeholder = tf.contrib.layers.flatten(placeholder)
-#     with tf.variable_scope(scope, reuse=reuse):
-#         out = placeholder
-#         out = tf.cast(out, tf.float32)
-#         out = tf.layers.dense(out, 64, bias_initializer=tf.zeros_initializer(), activation=tf.nn.softmax)
-#         out = tf.layers.dense(out, 64, bias_initializer=tf.zeros_initializer(), activation=tf.nn.softmax)
-#         out = tf.layers.dense(out, 9, kernel_initializer=tf.zeros_initializer(),
-#                               bias_initializer=tf.zeros_initializer(), activation=None)
-#     return out
-#
-#
-# def peek():
-#     print("peek")
-#     test_vars =  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="model-1")
-#     for var in test_vars:
-#         print(var.name, np.max(sess.run(var)))
-#
-# def policy(observations, model, observation_placeholder):
-#     dist = tf.distributions.Categorical(logits=model)
-#     return sess.run(dist.sample(), feed_dict={observation_placeholder: observations})
-#
-#
-# tf.reset_default_graph()
-#
-# #define the board, models
-# observation_placeholder = tf.placeholder(shape = [None, 3,3], dtype = tf.int32)
-# adv_n_placeholder = tf.placeholder(shape = [None], dtype = tf.float32)
-# action_placeholder = tf.placeholder(shape = [None], dtype = tf.int32)
-# new_model = TicTacToe_model(observation_placeholder, 9, scope = "model-1", reuse=tf.AUTO_REUSE)
-#
-#
-#
-# sess = tf.Session()
-#
-# sess.run(tf.global_variables_initializer())
-#
-# peek()
-#
-# player_NN = Players.NN_Player(new_model, sess, observation_placeholder)
-#
-# player_NN.peek()
-#
-# peek()
-# player_NN.peek()
-# board = np.array([[1,1,1],[1,1,1],[1,1,0]])
-# boards = np.array([board, board])
-#
-# print(str([player_NN.policy(boards) for i in range(2)]))
-# print(str([policy(boards, new_model, observation_placeholder) for i in range(2)]))
-# random_Player = Players.Random_Player()
-#
-# print(str([random_Player.policy(boards) for i in range(2)]))

@@ -20,7 +20,7 @@ class mcts_node_:
         self.action_visit_N = np.zeros((len(self.actions),), dtype=np.int64)
         # self.action_children = {}
 
-    def tree_policy(self):
+    def tree_policy(self, exploration_constant = 1):
         """Takes in a mcts_node
             -either picks random strategy or uses UCT1 to pick strategy
             returns the index for mcts_node.actions, NOT the action itself
@@ -30,7 +30,7 @@ class mcts_node_:
         if len(unvisited_action_indices) > 0:
             return np.random.choice(unvisited_action_indices)
         else:
-            UTC = self.get_UTC1()
+            UTC = self.get_UTC1(exploration_constant)
             return np.argmax(UTC)
 
     def exploit_policy(self):
@@ -44,8 +44,8 @@ class mcts_node_:
         else:
             return np.random.choice(self.actions)
 
-    def get_UTC1(self, explore_constant = 1):
-        return np.divide(self.rewards, self.action_visit_N) + explore_constant * np.sqrt(
+    def get_UTC1(self, exploration_constant = 1):
+        return np.divide(self.rewards, self.action_visit_N) + exploration_constant * np.sqrt(
                 np.log(self.visit_N) * (1. / self.action_visit_N))
 
     def get_expected_rewards(self):
@@ -57,7 +57,7 @@ class mcts_node_:
 
 class mcts():
 
-    def __init__(self, min_reward = 0, max_reward = 1):
+    def __init__(self, exploration_costant = 1):
         """We want an environment with the following commands:
             env.legal_moves()
             env.get_observation()
@@ -66,8 +66,7 @@ class mcts():
             """
 
         self.states = {}
-        self.min_reward = min_reward
-        self.max_reward = max_reward
+        self.exploration_constant = exploration_costant
 
 
     def rollout(self, environment_original):
@@ -93,7 +92,7 @@ class mcts():
 
             assert np.max(np.abs(np.diff(observation - mcts_node_cur.observation))) == 0, "hashing problem"
 
-            next_action = mcts_node_cur.tree_policy()
+            next_action = mcts_node_cur.tree_policy(exploration_constant=self.exploration_constant)
 
             backpropogate_mcts_nodes.append(mcts_node_cur)
             backpropogate_actions.append(next_action)
