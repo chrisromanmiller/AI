@@ -61,12 +61,14 @@ class TicTacToe():
 
 
 
-    def __init__(self):
+    def __init__(self, m = 3, n = 3, k = 3):
 
+        self.m = m
+        self.n = n
+        self.k = k
 
-
-        self.action_space = spaces.Discrete(9)
-        self.observation_space = spaces.Tuple((spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3)))
+        self.action_space = spaces.Discrete(m*n)
+        # self.observation_space = spaces.Tuple((spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3)))
 
 
         self.viewer = None
@@ -145,7 +147,7 @@ class TicTacToe():
 
         #make sure game is not over before attempting to play
         if not self.done:
-            assert self.state[action_row, action_col] ==0, print("You have played an illegal action. Use legal_moves()", self.state,self.get_observation(self.current_player), action)
+            assert self.state[action_row, action_col] == 0, print("You have played an illegal action. Use legal_moves()", self.state,self.get_observation(self.current_player), action)
 #             if self.state[action_row, action_col] != 0:
 #
 #                 # The action is on a cell already occupied, illegal move negative reward
@@ -201,17 +203,22 @@ class TicTacToe():
 
     def state_has_row(self):
         """Tests whether the current self.state has a horizontal, vertical, or diagonal row of the same player
-        Returns 0 if false, and the player Id (1 or 2) who has the row if true"""
+            returns boolean"""
         row_player_id = 0
+        current_player_state = self.state[self.current_player]
 
+
+        has_row = False
+
+        #TODO: implement
         # Horizontal Test
-        for row in range(3):
-            if self.state[row, 0] == self.state[row,1] and self.state[row,1] == self.state[row,2] and self.state[row,0] != 0:
-                row_player_id = self.state[row,0]
+        for row in range(self.m):
+            if np.all(current_player_state[row, :]):
+                has_row = True
         # Vertical Test
-        for col in range(3):
-            if self.state[0, col] == self.state[1, col] and self.state[1, col] == self.state[2, col] and self.state[0,col] != 0:
-                row_player_id = self.state[0, col]
+        for col in range(self.n):
+            if np.all(current_player_state[:, col]):
+                has_row = True
 
         #Diagonal Tests
         if self.state[0,0] == self.state[1,1] and self.state[1,1] == self.state[2,2] and self.state[0,0] != 0:
@@ -230,13 +237,16 @@ class TicTacToe():
                 state_flatten[index] = 1
         return np.array(state_flatten)
 
+    def _k_consecutive_and(self, numpy_bool):
+        """input is a 1 dim numpy bool array
+            determines whether k consecutive entries are True"""
+        
 
 
     def reset(self):
-        self.state = np.zeros((3,3), dtype=np.int16)
-        self.current_player = np.random.randint(1,3)
+        self.state = [np.zeros((self.m, self.n), dtype=np.bool_),np.zeros((self.m, self.n), dtype=np.bool_)]
+        self.current_player = np.random.randint(0,2)
         self.done = False
-        self.illegal_moves_N = [0,0]
         self.current_winner = None
 
         self.rewards = [0,0]
