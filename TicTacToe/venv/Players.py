@@ -10,8 +10,8 @@ class Player(ABC):
 
         @abstractmethod
         def policy(self, observations, legal_moves):
-            """ Input:  ndarray of observations, first axis has size batch_N
-                Output: ndarray of actions, first axis has size batch_N """
+            """ Input:  [None, obs_dim] array of observations, first axis has size batch_N
+                Output: [None, ac_dim] ndarray of actions, first axis has size batch_N """
             pass
 
 
@@ -45,7 +45,7 @@ class Random_Player(Player):
 
             random_action = None
             if len(legal_move_indices) > 0:
-                random_action = np.choice(legal_move_indices)
+                random_action = np.random.choice(legal_move_indices)
             actions.append(random_action)
 
 
@@ -53,6 +53,7 @@ class Random_Player(Player):
 
 
 class Expert_Player(Player):
+    """A player class that plays a single deterministic policy mimicking this xkcd comic: https://xkcd.com/832/"""
 
     def policy(self, observations, legal_moves):
         """	0 1 2
@@ -269,6 +270,7 @@ class Expert_Player(Player):
 
 
 class Child_Player(Player):
+    """A player class that blocks any two consecutive squares. Otherwise, it plays randomly"""
 
     def policy(self, observations, legal_moves):
         # block moves
@@ -353,7 +355,7 @@ class NN_Player(Player):
         actions = []
         for legal_move, dist in zip(legal_moves, distributions):
             indices = np.where(legal_move)[0]
-            if self.determistic:
+            if self.deterministic:
                 random_float = np.random.rand()
                 if random_float >= epsilon:
                     values = dist[indices]
@@ -363,8 +365,9 @@ class NN_Player(Player):
                     actions.append(np.random.choice(indices))
             else:
                 """TODO: TEST"""
-                legal_probabilities = np.multiply(dist, legal_move)
-                action = np.random.choice(range(len(legal_probabilities)),legal_probabilities)
+                legal_probabilities = np.multiply(dist, legal_move) 
+                legal_probabilities = legal_probabilities / np.sum(legal_probabilities) 
+                action = np.random.choice(range(len(legal_probabilities)), p = legal_probabilities)
                 actions.append(action)
 
         return actions
@@ -372,9 +375,10 @@ class NN_Player(Player):
 
 
 class MCTS_Player(Player):
-    """Player which uses a NN to dictate policy
-        model_sample_s symbolic operation to get probability distribution for actions
-        determistic determines whether to arg max or draw"""
+    """Player class which uses a Monte Carlo Tree Search algorithm to select actions"""
+
+    import MCTS
+    import TicTacToe
 
     def __init__(self, mcts):
         # Keep a fixed model pointer
@@ -383,8 +387,6 @@ class MCTS_Player(Player):
 
 
     def policy(self, observations, legal_moves):
-        import MCTS
-        import TicTacToe
         """ uses the exploitation part of MCTS to evaluate
             if state not seen before it picks a random action"""
         actions = []
