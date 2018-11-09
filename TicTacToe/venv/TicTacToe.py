@@ -1,5 +1,7 @@
 import math
 import gym
+import itertools
+import time
 from gym import spaces, logger
 from gym.utils import seeding
 import numpy as np
@@ -31,7 +33,7 @@ import numpy as np
 
 
 
-class TicTacToe():
+class mnk_game():
     """
     Description:
         Playing 2 player Tic Tac Toe
@@ -61,12 +63,14 @@ class TicTacToe():
 
 
 
-    def __init__(self):
+    def __init__(self, m = 3, n = 3, k = 3):
 
+        self.m = m
+        self.n = n
+        self.k = k
 
-
-        self.action_space = spaces.Discrete(9)
-        self.observation_space = spaces.Tuple((spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3)))
+        self.action_space = spaces.Discrete(m*n)
+        # self.observation_space = spaces.Tuple((spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3), spaces.Discrete(3)))
 
 
         self.viewer = None
@@ -78,227 +82,166 @@ class TicTacToe():
 
         self.rewards = None
 
-
         self.done = False
 
     def __str__(self):
         if self.state is None:
             return "Not Initialized"
         else:
-            state_strings = np.chararray((3,3))
-            for i in range(3):
-                for j in range(3):
-                    if self.state[i,j] == 0:
-                        state_strings[i,j] = ""
-                    else:
-                        state_strings[i,j] = str(self.state[i, j])
+            state_strings = np.chararray((self.m,self.n))
+            state_strings[:] = '-'
+            for i in range(self.m):
+                for j in range(self.n):
+                    if self.state[0,i,j]:
+                        state_strings[i,j] = "0"
+                    elif self.state[1,i,j]:
+                        state_strings[i,j] = "1"
 
 
 
             return_string = "Current Player: " + str(self.current_player) + "\n"
-            # return_string += state_strings[0,0] + "|" + state_strings[0,1] + "|" + state_strings[0,2] +"\n"
-            # return_string += "-----\n"
-            # return_string += state_strings[1,0] + "|" + state_strings[1,1] + "|" + state_strings[1,2] + "\n"
-            # return_string += "-----\n"
-            # return_string += state_strings[2,0] + "|" + state_strings[2,1] + "|" + state_strings[2,2] + "\n"
             return_string += str(state_strings)
         return return_string
-    # def seed(self):
-    #     self.np_random, seed = seeding.np_random(seed)
-    #     return [seed]
+
 
     """returns observation of the state for player_id"""
-    def get_observation(self, player_id):
-        current_observation = np.array(self.state)
-        if player_id == 2:
-            current_observation = self.flip_state(current_observation)
-        # if hashable:
-        #     return tictactoe_observation(current_observation)
-        # else:
-        return current_observation
+    def get_observation(self):
+        if self.current_player == 0:
+            return self.state
+        if self.current_player == 1:
+            return np.flip(self.state,0)
 
     @staticmethod
     def hash_observation(observation):
-        hash_value = int(0)
-        row_N = observation.shape[0]
-        for (row, col), value in np.ndenumerate(observation):
-            hash_value += value << (2 * (row_N * col + row))
-        return int(hash_value)
+        return hash(bytes(observation))
+        # hash_value = int(0)
+        # row_N = observation.shape[1]
+        # for (player_id, row, col), value in np.ndenumerate(observation):
+        #     hash_value += int(value) << (2 * (row_N * col + row) + player_id)
+        # return int(hash_value)
 
     """returns the current reward for """
-    def get_reward(self, player_id):
-        return self.rewards[player_id-1]
+    def get_reward(self):
+        return self.rewards[self.current_player]
 
     """observation and reward should be queried seperately on a per player basis"""
     def step(self, action):
         assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
         # state = self.state
 
-        self.rewards[self.current_player - 1] = 0
+        self.rewards[self.current_player] = 0
 
 
         # 0 1 2
         # 3 4 5
         # 6 7 8
-        action_col = action % 3
-        action_row = int((action - action_col)/3)
-
+        action_col = action % self.n
+        action_row = int((action - action_col)/self.m)
         #make sure game is not over before attempting to play
         if not self.done:
-            assert self.state[action_row, action_col] ==0, print("You have played an illegal action. Use legal_moves()", self.state,self.get_observation(self.current_player), action)
-#             if self.state[action_row, action_col] != 0:
-#
-#                 # The action is on a cell already occupied, illegal move negative reward
-#                 self.illegal_moves_N[self.current_player-1] += 1
-#                 reward += -1
-# #                self.done = True
-#             else:
-            self.state[action_row, action_col] = self.current_player
+
+            assert  (not self.state[0, action_row, action_col] and not self.state[1, action_row, action_col]), "You have played an illegal action. Use legal_moves()"
+            self.state[self.current_player, action_row, action_col] = True
 
 
-        #test for full board
-        if np.min(self.state) > 0:
+        #internal commands which test for termination conditions
+        _has_row = self.state_has_row()
+        _full_board = np.all(np.logical_or(self.state[0],self.state[1]))
+
+        if _has_row:
+            self.done = True
+            self.current_winner = self.current_player
+            self.rewards[self.current_winner] = 1
+        elif _full_board:
             self.done = True
             self.current_winner = 0
-            self.rewards[self.current_winner - 1] = .5
-            self.rewards[self.current_winner % 2] = .5
+            self.rewards = [.5, .5]
 
-        #internal command which tests for win condition
-        winner_id = self.state_has_row()
-        if winner_id != 0:
-            self.done = True
-            self.current_winner = winner_id
-            self.rewards[self.current_winner - 1] = 1
-            self.rewards[self.current_winner % 2] = 0
-            # if self.current_player == winner_id:
-            #     reward += 5
-            # else:
-            #     reward += -1
-
-
-
-        #swap players and flip state for player 2
-        # current_observation = np.array(self.state)
-        # if self.current_player == 1:
-        #     self.current_player = 2
-        #     current_observation = self.flip_state(current_observation)
-        # else:
-        #     self.current_player = 1
-        self.current_player = (self.current_player % 2) + 1
+        self.current_player = (self.current_player + 1) % 2
 
         return self.done, {}
 
 
-    def flip_state(self, alter_state):
-        for row in range(3):
-            for col in range(3):
-                if alter_state[row, col] == 1:
-                    alter_state[row, col] = 2
-                elif alter_state[row, col] == 2:
-                    alter_state[row, col] = 1
-        return alter_state
-
 
     def state_has_row(self):
         """Tests whether the current self.state has a horizontal, vertical, or diagonal row of the same player
-        Returns 0 if false, and the player Id (1 or 2) who has the row if true"""
-        row_player_id = 0
+            returns boolean"""
+        _current_player_state = self.state[self.current_player]
+        has_row = False
 
+        #TODO: implement
         # Horizontal Test
-        for row in range(3):
-            if self.state[row, 0] == self.state[row,1] and self.state[row,1] == self.state[row,2] and self.state[row,0] != 0:
-                row_player_id = self.state[row,0]
+        for row in range(self.m):
+            if mnk_game._consecutive_and(_current_player_state[row, :]) >= self.k:
+                return True
         # Vertical Test
-        for col in range(3):
-            if self.state[0, col] == self.state[1, col] and self.state[1, col] == self.state[2, col] and self.state[0,col] != 0:
-                row_player_id = self.state[0, col]
+        for col in range(self.n):
+            if mnk_game._consecutive_and(_current_player_state[:,col]) >= self.k:
+                return True
 
-        #Diagonal Tests
-        if self.state[0,0] == self.state[1,1] and self.state[1,1] == self.state[2,2] and self.state[0,0] != 0:
-            row_player_id = self.state[0,0]
-        if self.state[0,2] == self.state[1,1] and self.state[1,1] == self.state[2,0] and self.state[0,2] != 0:
-            row_player_id = self.state[0,2]
-        return int(row_player_id)
+        for diag in range(self.n):
+            _diag_line = np.diagonal(_current_player_state,diag)
+            if len(_diag_line) >= self.k and mnk_game._consecutive_and(_diag_line) >= self.k:
+                return True
+
+        _lr_current_player_state = np.fliplr(_current_player_state)
+        for antidiag in range(self.n):
+            _antidiag_line = np.diagonal(_lr_current_player_state,antidiag)
+            if len(_antidiag_line) >= self.k and mnk_game._consecutive_and(_antidiag_line) >= self.k:
+                return True
+
+        return False
 
     def legal_moves(self):
         """Returns binary mask on action space for legal moves"""
-        state_flatten =  self.state.flatten()
-        for index in range(len(state_flatten)):
-            if state_flatten[index] != 0:
-                state_flatten[index] = 0
-            else:
-                state_flatten[index] = 1
-        return np.array(state_flatten)
+        return np.logical_not(np.logical_or(self.state[0],self.state[1])).flatten()
+
+
+    #TODO: Can make faster?
+    @staticmethod
+    def _consecutive_and(numpy_bool):
+        """input is a 1 dim numpy bool array
+            determines maximal number of consecutive True"""
+        false_index = -1
+        max_false_gap = 0
+        for index, bool_entry in enumerate(numpy_bool):
+            if not bool_entry:
+                false_gap = index - false_index - 1
+                if false_gap > max_false_gap:
+                    max_false_gap = false_gap
+                false_index = index
+
+        false_gap = len(numpy_bool) - false_index - 1
+        if false_gap > max_false_gap:
+            max_false_gap = false_gap
+        return max_false_gap
+
+    # @staticmethod
+    # def _consecutive_and_test(numpy_bool):
+    #     max_true_length = 0
+    #     for bit, group_iterator in itertools.groupby(numpy_bool):
+    #         group_length = len(list(group_iterator))
+    #         if bit and group_length > max_true_length:
+    #             max_true_length = group_length
+    #     return max_true_length
 
 
 
     def reset(self):
-        self.state = np.zeros((3,3), dtype=np.int16)
-        self.current_player = np.random.randint(1,3)
+        self.state = np.array([np.zeros((self.m, self.n), dtype=np.bool_),np.zeros((self.m, self.n), dtype=np.bool_)])
+        self.current_player = np.random.randint(0,2)
         self.done = False
-        self.illegal_moves_N = [0,0]
         self.current_winner = None
 
         self.rewards = [0,0]
 
 
-        return np.array(self.state)
+        return self.state
 
 
 
-    def render(self, mode=''):
-        # screen_width = 600
-        # screen_height = 400
-        #
-        # world_width = self.x_threshold * 2
-        # scale = screen_width / world_width
-        # carty = 100  # TOP OF CART
-        # polewidth = 10.0
-        # polelen = scale * (2 * self.length)
-        # cartwidth = 50.0
-        # cartheight = 30.0
-        #
-        # if self.viewer is None:
-        #     from gym.envs.classic_control import rendering
-        #     self.viewer = rendering.Viewer(screen_width, screen_height)
-        #     l, r, t, b = -cartwidth / 2, cartwidth / 2, cartheight / 2, -cartheight / 2
-        #     axleoffset = cartheight / 4.0
-        #     cart = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
-        #     self.carttrans = rendering.Transform()
-        #     cart.add_attr(self.carttrans)
-        #     self.viewer.add_geom(cart)
-        #     l, r, t, b = -polewidth / 2, polewidth / 2, polelen - polewidth / 2, -polewidth / 2
-        #     pole = rendering.FilledPolygon([(l, b), (l, t), (r, t), (r, b)])
-        #     pole.set_color(.8, .6, .4)
-        #     self.poletrans = rendering.Transform(translation=(0, axleoffset))
-        #     pole.add_attr(self.poletrans)
-        #     pole.add_attr(self.carttrans)
-        #     self.viewer.add_geom(pole)
-        #     self.axle = rendering.make_circle(polewidth / 2)
-        #     self.axle.add_attr(self.poletrans)
-        #     self.axle.add_attr(self.carttrans)
-        #     self.axle.set_color(.5, .5, .8)
-        #     self.viewer.add_geom(self.axle)
-        #     self.track = rendering.Line((0, carty), (screen_width, carty))
-        #     self.track.set_color(0, 0, 0)
-        #     self.viewer.add_geom(self.track)
-        #
-        #     self._pole_geom = pole
-        #
-        # if self.state is None: return None
-        #
-        # # Edit the pole polygon vertex
-        # pole = self._pole_geom
-        # l, r, t, b = -polewidth / 2, polewidth / 2, polelen - polewidth / 2, -polewidth / 2
-        # pole.v = [(l, b), (l, t), (r, t), (r, b)]
-        #
-        # x = self.state
-        # cartx = x[0] * scale + screen_width / 2.0  # MIDDLE OF CART
-        # self.carttrans.set_translation(cartx, carty)
-        # self.poletrans.set_rotation(-x[2])
-        #
-        #
-        return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+    # def render(self, mode=''):
+    #     return self.viewer.render(return_rgb_array=mode == 'rgb_array')
 
 
     def close(self):
@@ -307,14 +250,22 @@ class TicTacToe():
             self.viewer = None
 
 
-if __name__ == 'main':
-    env = TicTacToe()
+if __name__ == '__main__':
+    env = mnk_game()
     env.reset()
-    print(env)
+    moves = [2,0,4,5,6,7]
+    for move in moves:
+        env.step(move)
+        obs = env.get_observation()
+        tic = time.time()
+        print(hash(bytes(obs)))
+        print(time.time() - tic)
 
-    while True:
-        action = int(input(" 0 1 2 \n 3 4 5 \n 6 7 8"))
-        current_observation, reward, done, what = env.step(action)
-        if done:
-            print("DONEDONEDONE")
-        print(env)
+        tic = time.time()
+        print(env.hash_observation(obs))
+        print(time.time() - tic)
+
+
+
+
+
