@@ -26,7 +26,7 @@ class Human_Player(Player):
             print(observation)
             while not is_legal_move:
                 action = int(input("Input a legal move:"))
-                is_legal_move = (legal_move[action] == 1)
+                is_legal_move = legal_move[action]
             actions.append(action)
         return actions
 
@@ -52,7 +52,11 @@ class Random_Player(Player):
         return actions
 
 
+<<<<<<< HEAD
 class Expert_Player(Player):
+=======
+class Expert_TicTacToe_Player(Player):
+>>>>>>> cd98e6d82c21412b4f06e0dc51a0b8f76e2920c2
     """A player class that plays a single deterministic policy mimicking this xkcd comic: https://xkcd.com/832/"""
 
     def policy(self, observations, legal_moves):
@@ -62,7 +66,9 @@ class Expert_Player(Player):
         actions = []
         for observation, legal_moves in zip(observations, legal_moves):
             action = None
-            observation_flatten_list = observation.flatten().tolist()
+            observation_one_two_rep = observation[0].astype(int) + 2*observation[1].astype(int)
+            observation_flatten_list = observation_one_two_rep.flatten().tolist()
+
             player_moves_N = observation_flatten_list.count(1)
             opponent_moves_N = observation_flatten_list.count(2)
             # handle edge cases
@@ -277,7 +283,8 @@ class Child_Player(Player):
 
         actions = []
         for observation, legal_move, in zip(observations, legal_moves):
-            observation_flatten_list = observation.flatten().tolist()
+            observation_one_two_rep = observation[0].astype(int) + 2*observation[1].astype(int)
+            observation_flatten_list = observation_one_two_rep.flatten().tolist()
             legal_move_indices = np.where(legal_move)[0]
             action = np.random.choice(legal_move_indices)
 
@@ -305,7 +312,6 @@ class Child_Player(Player):
             actions.append(action)
 
         return actions
-
 
 
 
@@ -377,9 +383,6 @@ class NN_Player(Player):
 class MCTS_Player(Player):
     """Player class which uses a Monte Carlo Tree Search algorithm to select actions"""
 
-    import MCTS
-    import TicTacToe
-
     def __init__(self, mcts):
         # Keep a fixed model pointer
         self.mcts = mcts
@@ -387,11 +390,14 @@ class MCTS_Player(Player):
 
 
     def policy(self, observations, legal_moves):
+
+        import MCTS
+        import tictactoe
         """ uses the exploitation part of MCTS to evaluate
             if state not seen before it picks a random action"""
         actions = []
         for observation, legal_move in zip(observations, legal_moves):
-            observation_hash = TicTacToe.TicTacToe.hash_observation(observation)
+            observation_hash = tictactoe.mnk_game.hash_observation(observation)
             try:
                 mcts_node = self.mcts.states[observation_hash]
             except KeyError:
