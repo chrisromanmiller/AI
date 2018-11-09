@@ -52,11 +52,7 @@ class Random_Player(Player):
         return actions
 
 
-<<<<<<< HEAD
-class Expert_Player(Player):
-=======
 class Expert_TicTacToe_Player(Player):
->>>>>>> cd98e6d82c21412b4f06e0dc51a0b8f76e2920c2
     """A player class that plays a single deterministic policy mimicking this xkcd comic: https://xkcd.com/832/"""
 
     def policy(self, observations, legal_moves):
