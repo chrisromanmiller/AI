@@ -109,11 +109,11 @@ class mnk_game():
         if self.current_player == 0:
             return self.state
         if self.current_player == 1:
-            return np.logical_not(self.state)
+            return np.flip(self.state,0)
 
     @staticmethod
     def hash_observation(observation):
-        return hash(bytes(obs))
+        return hash(bytes(observation))
         # hash_value = int(0)
         # row_N = observation.shape[1]
         # for (player_id, row, col), value in np.ndenumerate(observation):

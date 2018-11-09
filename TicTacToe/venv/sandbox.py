@@ -1,111 +1,31 @@
 import tensorflow as tf
 import gym.spaces
-import TicTacToe
+import tictactoe
 import numpy as np
 import Players
 import MCTS
 from collections import Counter
-
-def batch_rollout(player, opponent, env, max_time_steps=100):
-    '''Produces a batch of rollouts from the environment.
-    Inputs:
-        player: realization of Player.Player abstract class
-        opponent: realization of Player.Player abstract class
-        env: an environment
-        max_time_steps: an integer
-
-    This function plays a number of rounds of a two-player game, and returns the trajectories observed by player
-
-    Returns:
-        paths: a list of dictionaries. Each dictionary is a rollout, and takes the keys:
-            'observation': [None, obs_dime] np.array of the observations of player
-            'action': [None,] np.array of the actions of player
-            'reward': [None,] np.array of the rewards gotten by player
-        batch_winners: TODO
-    '''
-    paths = []
-    batch_winners = Counter({0: 0, 1: 0, 2: 0})
-    time_steps = 0
-    while time_steps < max_time_steps:
-        path = sample_trajectory(player, opponent, env)
-        paths += [path]
-        batch_winners[env.current_winner] += 1
-        time_steps += len(path['observation'])
-    return paths, batch_winners
-
-
-def sample_trajectory(player, opponent, env):
-    """Produces a single rollout of the environment following the player policy
-    Inputs:
-        player:   realization of Player.Player abstract class
-        opponent: realization of Player.Player abstract class
-        env:      environment which follows open ai gym environment structure and has a current_player int either 1 or 2
-        TODO: it doesn't quite match the reward structure, no?^
-
-    Returns:
-    a list of dictionaries. Each dictionary is a rollout, and takes the keys:
-        'observation': [None, obs_dime] np.array of the observations of player
-        'action': [None,] np.array of the actions of player
-        'reward': [None,] np.array of the rewards gotten by player
-    """
-
-    obs, acs, rewards, masks = [], [], [], []
-    ob = env.reset()
-    done = False
-    player_has_acted = False
-    action = None
-
-    # Do rest of moves
-    while not done:
-        # Get current observation of current player
-        ob = env.get_observation(env.current_player)
-        legal_moves = env.legal_moves()
-        if env.current_player == 1:
-            # Reward is recorded as results of state,action pair... need to check player 1 has acted already
-            if player_has_acted:
-                rewards.append(env.get_reward(1))
-            else:
-                player_has_acted = True
-
-            action = player.policy(np.array([ob]), np.array([legal_moves]))
-            obs.append(ob)
-            acs.append(action[0])
-            masks.append(legal_moves)
-        else:
-            action = opponent.policy(np.array([ob]), np.array([legal_moves]))
-        done, _ = env.step(action[0])
-
-        # Need to record final reward for player 1
-    rewards.append(env.get_reward(1))
-
-    path = {"observation": np.array(obs, dtype=np.int32),
-            "reward": np.array(rewards, dtype=np.float32),
-            "action": np.array(acs, dtype=np.int32),
-            "mask": np.array(masks, dtype=np.int32)}
-    return path
-
+import multiplayer_tools
 
 tf.reset_default_graph()
 
-env = TicTacToe.TicTacToe()
+env = tictactoe.mnk_game(m=5, n=5, k=4)
 env.reset()
 
 mcts = MCTS.mcts(exploration_costant=.8)
 
 child = Players.Child_Player()
-expert = Players.Expert_Player()
+expert = Players.Expert_TicTacToe_Player()
+random = Players.Random_Player()
 mcts_player = Players.MCTS_Player(mcts)
-for x in range(15000):
+for x in range(150000):
     if x % 100 == 0:
-        _, stats = batch_rollout(expert, mcts_player, env)
+        _, stats = multiplayer_tools.batch_rollout(random, mcts_player, env)
         print(stats[0], stats[1], stats[2])
-        if stats[1] == 0:
-            print(x)
-            print(len(mcts.states))
-            break
     env.reset()
     mcts.rollout(env)
-
+env.reset()
+multiplayer_tools.batch_rollout(Players.Human_Player(), mcts_player,env)
 
 
 # def TicTacToe_model(placeholder, num_actions, scope, reuse=tf.AUTO_REUSE):
