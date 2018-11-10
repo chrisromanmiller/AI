@@ -47,16 +47,15 @@ def sample_trajectory(player, opponent, env):
     """
 
     obs, acs, rewards, masks = [], [], [], []
-    ob = env.reset()
     done = False
     player_has_acted = False
-    action = None
 
     # Do rest of moves
     while not done:
         # Get current observation of current player
         ob = env.get_observation()
         legal_moves = env.legal_moves()
+        environments = [env]
         if env.current_player == 1:
             # Reward is recorded as results of state,action pair... need to check player 1 has acted already
             if player_has_acted:
@@ -64,21 +63,21 @@ def sample_trajectory(player, opponent, env):
             else:
                 player_has_acted = True
 
-            action = player.policy(np.array([ob]), np.array([legal_moves]))
+            action = player.policy(environments)
             obs.append(ob)
             acs.append(action[0])
             masks.append(legal_moves)
         else:
-            action = opponent.policy(np.array([ob]), np.array([legal_moves]))
+            action = opponent.policy(environments)
         done, _ = env.step(action[0])
 
         # Need to record final reward for player 1
     rewards.append(env.rewards[0])
 
-    path = {"observation": np.array(obs, dtype=np.int32),
+    path = {"observation": np.array(obs, dtype=np.bool_),
             "reward": np.array(rewards, dtype=np.float32),
             "action": np.array(acs, dtype=np.int32),
-            "mask": np.array(masks, dtype=np.int32)}
+            "mask": np.array(masks, dtype=np.bool_)}
     return path
 
 
