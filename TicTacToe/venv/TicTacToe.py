@@ -248,21 +248,14 @@ class mnk_game():
 
 
 if __name__ == '__main__':
-    env = mnk_game()
+    env = mnk_game(m=5,n=5,k=4)
     env.reset()
-    moves = [2,0,4,5,6,7]
+    moves = [3,16,7,19,11,17,15,18]
     for move in moves:
         env.step(move)
         obs = env.get_observation()
-        tic = time.time()
-        print(hash(bytes(obs)))
-        print(time.time() - tic)
-
-        tic = time.time()
-        print(env.hash_observation(obs))
-        print(time.time() - tic)
-
-
+        print(obs)
+        print(env.done)
 
 
 

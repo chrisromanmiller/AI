@@ -20,13 +20,15 @@ random = Players.Random_Player()
 human = Players.Human_Player()
 mcts_player = Players.MCTS_Player(mcts)
 
-mcts.batch_rollout(env,1000)
+mcts.batch_rollout(env,100000)
+env.reset()
+print(mcts.grab_mcts_node(env).action_visit_N)
 # for x in range(15000):
 #     if x % 100 == 0:
 #         print(x)
 #     env.reset()
 #     mcts.rollout(env)
-_, stats = multiplayer_tools.batch_rollout(human, mcts_player, env)
+multiplayer_tools.sample_trajectory(human, mcts_player, env)
 
 
 

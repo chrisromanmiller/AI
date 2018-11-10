@@ -23,7 +23,7 @@ class Human_Player(Player):
         actions = []
         for environment in environments:
             observation = environment.get_observation()
-            legal_move = environment.legal_move()
+            legal_move = environment.legal_moves()
             is_legal_move = False
             print(observation)
             while not is_legal_move:
@@ -44,7 +44,7 @@ class Random_Player(Player):
         actions = []
         for environment in environments:
             observation = environment.get_observation()
-            legal_move = environment.legal_move()
+            legal_move = environment.legal_moves()
             legal_move_indices = np.where(legal_move)[0]
 
             random_action = None
@@ -66,7 +66,7 @@ class Expert_TicTacToe_Player(Player):
         actions = []
         for environment in environments:
             observation = environment.get_observation()
-            legal_move = environment.legal_move()
+            legal_move = environment.legal_moves()
             action = None
             observation_one_two_rep = observation[0].astype(int) + 2*observation[1].astype(int)
             observation_flatten_list = observation_one_two_rep.flatten().tolist()
@@ -286,7 +286,7 @@ class Child_Player(Player):
         actions = []
         for environment in environments:
             observation = environment.get_observation()
-            legal_move = environment.legal_move()
+            legal_move = environment.legal_moves()
 
             observation_one_two_rep = observation[0].astype(int) + 2*observation[1].astype(int)
             observation_flatten_list = observation_one_two_rep.flatten().tolist()
@@ -362,7 +362,7 @@ class NN_Player(Player):
         """evaluates model_sample_s with probability 1 - eps
             returns random legal_move with probability eps"""
         observations = [environment.get_observation() for environment in environments]
-        legal_moves = [environment.legal_move() for environment in environments]
+        legal_moves = [environment.legal_moves() for environment in environments]
 
         distributions = self.session.run(self.model_sample_s,
                                          feed_dict={self.observation_placeholder: observations})
@@ -405,7 +405,7 @@ class MCTS_Player(Player):
             if state not seen before it picks a random action"""
         actions = []
         for environment in environments:
-            self.mcts.batch_rollout(environment, 1000)
+            self.mcts.batch_rollout(environment, 10000)
             mcts_node = self.mcts.grab_mcts_node(environment)
             actions.append(mcts_node.exploit_policy())
         return actions

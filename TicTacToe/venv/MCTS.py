@@ -79,11 +79,11 @@ class mcts():
 
     def grab_mcts_node(self, environment):
         observation = environment.get_observation()
-        observation_hash = self.environment_rollout.hash_observation(observation)
+        observation_hash = environment.hash_observation(observation)
         try:
             mcts_node_cur = self.states[observation_hash]
         except KeyError:
-            mcts_node_cur = mcts_node_(observation, self.environenvironment_rolloutment.legal_moves())
+            mcts_node_cur = mcts_node_(observation, environment.legal_moves())
             self.states[observation_hash] = mcts_node_cur
 
         assert (not np.any(np.logical_xor(observation, mcts_node_cur.observation))), "hashing problem"
@@ -94,7 +94,7 @@ class mcts():
     def rollout(self, environment):
 
         import copy
-        self.environment_rollout = copy.deepcopy(environment)
+        environment_rollout = copy.deepcopy(environment)
 
         backpropogate_mcts_nodes = []
         backpropogate_actions = []
@@ -102,19 +102,19 @@ class mcts():
         backpropogate_player_index = []
 
         #rollout phase, using tree policy
-        while not self.environment_rollout.done:
+        while not environment_rollout.done:
 
-            mcts_node_cur = self.current_mcts_node(self.environment_rollout)
+            mcts_node_cur = self.grab_mcts_node(environment_rollout)
 
             next_action = mcts_node_cur.tree_policy(exploration_constant=self.exploration_constant)
 
             backpropogate_mcts_nodes.append(mcts_node_cur)
             backpropogate_actions.append(next_action)
-            backpropogate_player_index.append(self.environment_rollout.current_player)
+            backpropogate_player_index.append(environment_rollout.current_player)
 
-            self.environment_rollout.step(mcts_node_cur.actions[next_action])
+            environment_rollout.step(mcts_node_cur.actions[next_action])
 
-            backpropogate_rewards.append(np.array(self.environment_rollout.rewards))
+            backpropogate_rewards.append(np.array(environment_rollout.rewards))
 
         #backpropogate reward
         rollout_N = len(backpropogate_rewards)
