@@ -4,6 +4,7 @@ import TicTacToe
 import numpy as np
 import Players
 import MCTS
+import time
 from collections import Counter
 import multiplayer_tools
 
@@ -13,22 +14,37 @@ env = TicTacToe.mnk_game(m=5,n=5,k=4)
 env.reset()
 
 mcts = MCTS.mcts(exploration_costant=.8)
+mcts2 = MCTS.mcts(exploration_costant=.8)
 
 child = Players.Child_Player()
 # expert = Players.Expert_Player()
 random = Players.Random_Player()
 human = Players.Human_Player()
 mcts_player = Players.MCTS_Player(mcts)
+mcts2_player = Players.MCTS_Player(mcts2)
 
-mcts.batch_rollout(env,100000)
+# multiplayer_tools.sample_trajectory(mcts_player,human,env)
+tic = time.time()
+mcts2.batch_rollout(env,2100000)
+print(time.time() - tic)
 env.reset()
-print(mcts.grab_mcts_node(env).action_visit_N)
+tic = time.time()
+multiplayer_tools.batch_rollout(mcts_player, mcts_player, env, max_time_steps=100)
+print(time.time() - tic)
+env.reset()
 # for x in range(15000):
 #     if x % 100 == 0:
 #         print(x)
 #     env.reset()
 #     mcts.rollout(env)
-multiplayer_tools.sample_trajectory(human, mcts_player, env)
+# multiplayer_tools.sample_trajectory(mcts_player, mcts_player, env)
+env.reset()
+# multiplayer_tools.sample_trajectory(mcts_player, mcts_player, env)
+# env.reset()
+tic = time.time()
+_, winners = multiplayer_tools.batch_rollout(mcts2_player, mcts_player, env)
+print(time.time() - tic)
+print(winners)
 
 
 

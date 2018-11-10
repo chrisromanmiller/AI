@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import tensorflow as tf
-
+import tkinter
 
 class Player(ABC):
 
@@ -17,6 +17,16 @@ class Player(ABC):
 
 class Human_Player(Player):
     """A player class which shows an input and waits for legal move"""
+    def __init__(self, graphics=True):
+        self.graphics = graphics
+        self.root = None
+        self.action = None
+
+    def button_press(self, widget):
+        self.action = widget.position
+        # Mark this button as invalid
+        self.root.destroy()
+
 
 
     def policy(self, environments):
@@ -24,12 +34,43 @@ class Human_Player(Player):
         for environment in environments:
             observation = environment.get_observation()
             legal_move = environment.legal_moves()
-            is_legal_move = False
-            print(observation)
-            while not is_legal_move:
-                action = int(input("Input a legal move:"))
-                is_legal_move = legal_move[action]
-            actions.append(action)
+            if self.graphics:
+
+                self.root = tkinter.Tk()
+                tkinter.Grid.rowconfigure(self.root, 0, weight=1)
+                tkinter.Grid.columnconfigure(self.root, 0, weight=1)
+
+                # Create & Configure frame
+                frame = tkinter.Frame(self.root)
+                frame.grid(row=0, column=0)
+
+
+                for row_index in range(environment.m):
+                    tkinter.Grid.rowconfigure(frame, row_index, weight=1)
+                    for col_index in range(environment.n):
+                        tkinter.Grid.columnconfigure(frame, col_index, weight=1)
+                        button_text=""
+                        if observation[0,row_index,col_index]:
+                            button_text = "O"
+                        elif observation[1,row_index,col_index]:
+                            button_text = "X"
+                        btn = tkinter.Button(frame, text=button_text)  # create a button inside frame
+                        if button_text == "":
+                            btn.config(command=lambda widget=btn: self.button_press(widget))
+                        else:
+                            btn.config(state = "disabled")
+                        btn.grid(row=row_index, column=col_index)
+                        btn.position = row_index * environment.n + col_index
+
+                self.root.mainloop()
+                actions.append(self.action)
+            else:
+                is_legal_move = False
+                print(observation)
+                while not is_legal_move:
+                    action = int(input("Input a legal move:"))
+                    is_legal_move = legal_move[action]
+                actions.append(action)
         return actions
 
 
