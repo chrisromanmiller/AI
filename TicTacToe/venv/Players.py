@@ -9,7 +9,7 @@ class Player(ABC):
         super().__init__()
 
         @abstractmethod
-        def policy(self, observations, legal_moves):
+        def policy(self, environments):
             """ Input:  [None, obs_dim] array of observations, first axis has size batch_N
                 Output: [None, ac_dim] ndarray of actions, first axis has size batch_N """
             pass
@@ -19,9 +19,11 @@ class Human_Player(Player):
     """A player class which shows an input and waits for legal move"""
 
 
-    def policy(self, observations, legal_moves):
+    def policy(self, environments):
         actions = []
-        for observation, legal_move in zip(observations, legal_moves):
+        for environment in environments:
+            observation = environment.get_observation()
+            legal_move = environment.legal_move()
             is_legal_move = False
             print(observation)
             while not is_legal_move:
@@ -35,12 +37,14 @@ class Random_Player(Player):
     """A player class which randomly picks a legal move"""
 
 
-    def policy(self, observations, legal_moves):
+    def policy(self, environments):
         """Currently poorly coded: doesnt use legal moves"""
 
         import numpy as np
         actions = []
-        for observation, legal_move, in zip(observations, legal_moves):
+        for environment in environments:
+            observation = environment.get_observation()
+            legal_move = environment.legal_move()
             legal_move_indices = np.where(legal_move)[0]
 
             random_action = None
@@ -55,12 +59,14 @@ class Random_Player(Player):
 class Expert_TicTacToe_Player(Player):
     """A player class that plays a single deterministic policy mimicking this xkcd comic: https://xkcd.com/832/"""
 
-    def policy(self, observations, legal_moves):
+    def policy(self, environments):
         """	0 1 2
             3 4 5
             6 7 8 """
         actions = []
-        for observation, legal_moves in zip(observations, legal_moves):
+        for environment in environments:
+            observation = environment.get_observation()
+            legal_move = environment.legal_move()
             action = None
             observation_one_two_rep = observation[0].astype(int) + 2*observation[1].astype(int)
             observation_flatten_list = observation_one_two_rep.flatten().tolist()
@@ -274,11 +280,14 @@ class Expert_TicTacToe_Player(Player):
 class Child_Player(Player):
     """A player class that blocks any two consecutive squares. Otherwise, it plays randomly"""
 
-    def policy(self, observations, legal_moves):
+    def policy(self, environments):
         # block moves
 
         actions = []
-        for observation, legal_move, in zip(observations, legal_moves):
+        for environment in environments:
+            observation = environment.get_observation()
+            legal_move = environment.legal_move()
+
             observation_one_two_rep = observation[0].astype(int) + 2*observation[1].astype(int)
             observation_flatten_list = observation_one_two_rep.flatten().tolist()
             legal_move_indices = np.where(legal_move)[0]
@@ -349,9 +358,12 @@ class NN_Player(Player):
         for var in test_vars:
             print(var.name, np.max(self.session.run(var)))
 
-    def policy(self, observations, legal_moves, epsilon=0):
+    def policy(self, environments, epsilon=0):
         """evaluates model_sample_s with probability 1 - eps
             returns random legal_move with probability eps"""
+        observations = [environment.get_observation() for environment in environments]
+        legal_moves = [environment.legal_move() for environment in environments]
+
         distributions = self.session.run(self.model_sample_s,
                                          feed_dict={self.observation_placeholder: observations})
         actions = []
@@ -385,18 +397,15 @@ class MCTS_Player(Player):
 
 
 
-    def policy(self, observations, legal_moves):
+    def policy(self, environments):
 
         import MCTS
-        import tictactoe
+        import TicTacToe as tictactoe
         """ uses the exploitation part of MCTS to evaluate
             if state not seen before it picks a random action"""
         actions = []
-        for observation, legal_move in zip(observations, legal_moves):
-            observation_hash = tictactoe.mnk_game.hash_observation(observation)
-            try:
-                mcts_node = self.mcts.states[observation_hash]
-            except KeyError:
-                mcts_node = MCTS.mcts_node_(observation, legal_move)
+        for environment in environments:
+            self.mcts.batch_rollout(environment, 1000)
+            mcts_node = self.mcts.grab_mcts_node(environment)
             actions.append(mcts_node.exploit_policy())
         return actions

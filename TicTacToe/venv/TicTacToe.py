@@ -120,9 +120,6 @@ class mnk_game():
         #     hash_value += int(value) << (2 * (row_N * col + row) + player_id)
         # return int(hash_value)
 
-    """returns the current reward for """
-    def get_reward(self):
-        return self.rewards[self.current_player]
 
     """observation and reward should be queried seperately on a per player basis"""
     def step(self, action):

@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 class mcts_node_:
     """
@@ -12,7 +13,9 @@ class mcts_node_:
     def __init__(self, observation, legal_moves):
         """state should be whatever form using for the mcts dictionary
            actions should be a list of actions that can be fed into env.step"""
-        self.observation = observation
+        import copy
+
+        self.observation = copy.copy(observation)
         possible_actions = np.where(legal_moves)[0]
         self.actions = possible_actions
         self.rewards = np.zeros((len(self.actions),))
@@ -38,8 +41,8 @@ class mcts_node_:
         visited_action_indices = np.where(self.action_visit_N != 0)[0]
         # Default policy: uniform random
         if len(visited_action_indices) > 0:
-            expected_reward = np.divide(self.rewards[visited_action_indices], self.action_visit_N[visited_action_indices])
-            optimal_index = visited_action_indices[np.argmax(expected_reward)]
+            # expected_reward = np.divide(self.rewards[visited_action_indices], self.action_visit_N[visited_action_indices])
+            optimal_index = np.argmax(self.action_visit_N)
             return self.actions[optimal_index]
         else:
             return np.random.choice(self.actions)
@@ -67,12 +70,31 @@ class mcts():
 
         self.states = {}
         self.exploration_constant = exploration_costant
+        # self.environment_rollout = copy.deepcopy(self.environment)
+
+    def batch_rollout(self, environment, total_simulations):
+        simulation_N = 0
+        while simulation_N < total_simulations:
+            simulation_N += self.rollout(environment)
+
+    def grab_mcts_node(self, environment):
+        observation = environment.get_observation()
+        observation_hash = self.environment_rollout.hash_observation(observation)
+        try:
+            mcts_node_cur = self.states[observation_hash]
+        except KeyError:
+            mcts_node_cur = mcts_node_(observation, self.environenvironment_rolloutment.legal_moves())
+            self.states[observation_hash] = mcts_node_cur
+
+        assert (not np.any(np.logical_xor(observation, mcts_node_cur.observation))), "hashing problem"
+
+        return mcts_node_cur
 
 
-    def rollout(self, environment_original):
+    def rollout(self, environment):
 
         import copy
-        environment = copy.deepcopy(environment_original)
+        self.environment_rollout = copy.deepcopy(environment)
 
         backpropogate_mcts_nodes = []
         backpropogate_actions = []
@@ -80,27 +102,19 @@ class mcts():
         backpropogate_player_index = []
 
         #rollout phase, using tree policy
-        while not environment.done:
-            player_id = environment.current_player
-            observation = environment.get_observation(player_id)
-            observation_hash = environment.hash_observation(observation)
-            try:
-                mcts_node_cur = self.states[observation_hash]
-            except KeyError:
-                mcts_node_cur = mcts_node_(observation, environment.legal_moves())
-                self.states[observation_hash] = mcts_node_cur
+        while not self.environment_rollout.done:
 
-            assert np.max(np.abs(np.diff(observation - mcts_node_cur.observation))) == 0, "hashing problem"
+            mcts_node_cur = self.current_mcts_node(self.environment_rollout)
 
             next_action = mcts_node_cur.tree_policy(exploration_constant=self.exploration_constant)
 
             backpropogate_mcts_nodes.append(mcts_node_cur)
             backpropogate_actions.append(next_action)
-            backpropogate_player_index.append(environment.current_player)
+            backpropogate_player_index.append(self.environment_rollout.current_player)
 
-            environment.step(mcts_node_cur.actions[next_action])
+            self.environment_rollout.step(mcts_node_cur.actions[next_action])
 
-            backpropogate_rewards.append(np.array(environment.rewards))
+            backpropogate_rewards.append(np.array(self.environment_rollout.rewards))
 
         #backpropogate reward
         rollout_N = len(backpropogate_rewards)
@@ -110,19 +124,19 @@ class mcts():
         total_reward = backpropogate_rewards[-1]
         for index in reversed(range(rollout_N)):
             backpropogate_cummulative_reward[index] = total_reward
-            player_index = backpropogate_player_index[index] - 1
+            player_index = backpropogate_player_index[index]
 
             if index > 0:
-                total_reward[player_index] += backpropogate_rewards[index -1][player_index - 1]
+                total_reward[player_index] += backpropogate_rewards[index -1][player_index]
 
         #upadte all visited nodes
         for mcts_node, action, reward_to_go, player_index in zip(backpropogate_mcts_nodes, backpropogate_actions, backpropogate_cummulative_reward, backpropogate_player_index):
             #update the node count, edge count, and edge reward
-            mcts_node.rewards[action] += reward_to_go[player_index - 1]
+            mcts_node.rewards[action] += reward_to_go[player_index]
             mcts_node.visit_N += 1
             mcts_node.action_visit_N[action] += 1
 
-
+        return rollout_N
 
 
 
