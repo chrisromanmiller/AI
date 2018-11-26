@@ -3,6 +3,38 @@
 import tensorflow as tf
 import numpy as np
 
+
+def TicTacToe_model(observation_placeholder, scope, num_actions = 9):
+    '''A model for a TicTacToe Q-function
+    Inputs:
+        observation_placeholder: [None, ob_dim] placeholder representing inputs to our neural network
+        scope: a string that becomes the scope of all layers in this network
+        reuse: 
+        num_actions: an int representing the number of possible actions (the output dimension)
+    
+    The final layer outputs values in the range [-1,1], which matches the range of possible target q-values
+    placeholder = tf.contrib.layers.flatten(placeholder)
+    
+    The Q-function is thought of as a function of two varables Q(s,a). Here we treat it as a num_actions-dimensional
+    function of one variable, so that Q(s,a) = Q(s)[a]
+    
+    We initialize bias and weights to zero, except for the final layer, where the weights are initialized to one.  
+    
+    Returns:
+        model: [None, num_actions] variable representing the outputs of our q-function
+    '''
+    with tf.variable_scope(scope):
+        out = tf.contrib.layers.flatten(observation_placeholder)
+        out = tf.contrib.layers.flatten(observation_placeholder)        
+        out = tf.cast(out, tf.float32)
+        out = tf.layers.dense(out, 64  , bias_initializer = tf.zeros_initializer(), activation = tf.nn.softmax)
+        out = tf.layers.dense(out, 64  , bias_initializer = tf.zeros_initializer(), activation = tf.nn.softmax)
+        out = tf.layers.dense(out, 64  , bias_initializer = tf.zeros_initializer(), activation = tf.nn.softmax)
+        out = tf.layers.dense(out, num_actions , kernel_initializer = tf.zeros_initializer(), bias_initializer = tf.zeros_initializer(), activation = tf.nn.sigmoid)
+        out = (out*2)-1
+    return out
+
+
 def symbolic_Q_update(model, target_placeholder, action_placeholder, learning_rate = .01):
     '''Produce the symbolic variables for loss, the update, and the optimizer
     Inputs:
