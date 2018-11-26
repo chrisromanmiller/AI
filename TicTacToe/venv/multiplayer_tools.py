@@ -1,4 +1,4 @@
-
+import copy
 from collections import Counter
 import numpy as np
 
@@ -21,13 +21,14 @@ def batch_rollout(player, opponent, env, max_time_steps=100):
         batch_winners: TODO
     '''
     paths = []
-    batch_winners = Counter({0: 0, 1: 0, 2: 0})
+    batch_winners = Counter({0: 0, 1: 0, "draw": 0})
     time_steps = 0
     while time_steps < max_time_steps:
+        env.reset()
         path = sample_trajectory(player, opponent, env)
         paths += [path]
         batch_winners[env.current_winner] += 1
-        time_steps += len(path['observation'])
+        time_steps += path['observation'].shape[0]
     return paths, batch_winners
 
 
@@ -72,7 +73,6 @@ def sample_trajectory(player, opponent, env):
 
         # Need to record final reward for player 1
     rewards.append(env.rewards[0])
-
     path = {"observation": np.array(obs, dtype=np.bool_),
             "reward": np.array(rewards, dtype=np.float32),
             "action": np.array(acs, dtype=np.int32),

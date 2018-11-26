@@ -151,7 +151,7 @@ class mnk_game():
             self.rewards[self.current_winner] = 1
         elif _full_board:
             self.done = True
-            self.current_winner = 0
+            self.current_winner = "draw"
             self.rewards = [.5, .5]
 
         self.current_player = (self.current_player + 1) % 2
@@ -176,15 +176,15 @@ class mnk_game():
             if mnk_game._consecutive_and(_current_player_state[:,col]) >= self.k:
                 return True
 
-        for diag in range(self.n):
+        for diag in range(-self.m + self.k, self.n - self.k + 1):
             _diag_line = np.diagonal(_current_player_state,diag)
-            if len(_diag_line) >= self.k and mnk_game._consecutive_and(_diag_line) >= self.k:
+            if mnk_game._consecutive_and(_diag_line) >= self.k:
                 return True
 
         _lr_current_player_state = np.fliplr(_current_player_state)
-        for antidiag in range(self.n):
+        for antidiag in range(-self.m + self.k, self.n - self.k + 1):
             _antidiag_line = np.diagonal(_lr_current_player_state,antidiag)
-            if len(_antidiag_line) >= self.k and mnk_game._consecutive_and(_antidiag_line) >= self.k:
+            if mnk_game._consecutive_and(_antidiag_line) >= self.k:
                 return True
 
         return False
